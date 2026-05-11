@@ -1,0 +1,749 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>5일 묵상 — 한 가족이 되신 예수님 · 사도신경 강해 10</title>
+<meta name="description" content="사도신경 강해 10 '죽으시고, 장사된 지' 본문에서 출발한 청소년부 5일 묵상 시리즈." />
+<link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable.min.css" />
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&family=Fraunces:opsz,wght@9..144,300;9..144,400;9..144,500;9..144,600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --primary: #000000;
+    --canvas: #FFFFFF;
+    --inverse-canvas: #000000;
+    --surface-soft: #F5F5F5;
+    --hairline: #E5E5E5;
+    --hairline-soft: #F0F0F0;
+    --ink: #000000;
+    --inverse-ink: #FFFFFF;
+
+    --block-cream: #F5EFE0;
+    --block-mint: #D4ECD8;
+    --block-lilac: #E0D9F2;
+    --block-lime: #DBE89A;
+    --block-coral: #F5C5B8;
+    --block-navy: #1F2451;
+    --block-pink: #F4D9E2;
+
+    --accent-magenta: #FF2D87;
+    --semantic-success: #16A34A;
+
+    --font-sans: "Pretendard Variable", Pretendard, -apple-system, BlinkMacSystemFont, "Apple SD Gothic Neo", system-ui, sans-serif;
+    --font-display: "Fraunces", "Pretendard Variable", Pretendard, "Apple SD Gothic Neo", serif;
+    --font-mono: "JetBrains Mono", "SF Mono", Menlo, monospace;
+
+    --space-xxs: 4px;  --space-xs: 8px;  --space-sm: 12px;  --space-md: 16px;
+    --space-lg: 24px;  --space-xl: 32px; --space-xxl: 48px; --space-section: 96px;
+
+    --r-xs: 2px;  --r-sm: 6px;  --r-md: 8px;  --r-lg: 24px;  --r-xl: 32px;
+    --r-pill: 50px; --r-full: 9999px;
+
+    --max-content: 1200px;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html { scroll-behavior: smooth; scroll-padding-top: 100px; }
+  body {
+    font-family: var(--font-sans);
+    color: var(--ink);
+    background: var(--canvas);
+    font-weight: 400;
+    font-size: 18px;
+    line-height: 1.5;
+    letter-spacing: -0.01em;
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+  }
+  ::selection { background: var(--block-lime); color: var(--ink); }
+
+  /* ============= Top Nav ============= */
+  .top-nav {
+    position: sticky; top: 0; z-index: 100;
+    background: rgba(255,255,255,0.92);
+    backdrop-filter: saturate(180%) blur(14px);
+    -webkit-backdrop-filter: saturate(180%) blur(14px);
+    border-bottom: 1px solid var(--hairline-soft);
+    height: 60px; display: flex; align-items: center;
+  }
+  .top-nav-inner {
+    width: 100%; max-width: var(--max-content); margin: 0 auto;
+    padding: 0 var(--space-xxl);
+    display: flex; align-items: center; justify-content: space-between; gap: var(--space-lg);
+  }
+  .logo {
+    font-family: var(--font-display);
+    font-weight: 500;
+    font-size: 22px;
+    letter-spacing: -0.02em;
+    color: var(--ink);
+    text-decoration: none;
+  }
+  .logo .dot { color: var(--accent-magenta); }
+  .top-nav nav { display: flex; gap: var(--space-xl); align-items: center; }
+  .top-nav nav a {
+    color: var(--ink); text-decoration: none;
+    font-size: 15px; font-weight: 450; letter-spacing: -0.01em;
+  }
+  .top-nav nav a:hover { color: var(--accent-magenta); }
+  .top-nav-actions { display: flex; gap: var(--space-sm); }
+
+  /* ============= Buttons ============= */
+  .btn {
+    display: inline-flex; align-items: center; justify-content: center;
+    font-family: var(--font-sans);
+    font-size: 15px; font-weight: 500; letter-spacing: -0.01em; line-height: 1;
+    padding: 10px 22px; border-radius: var(--r-pill);
+    border: none; cursor: pointer; text-decoration: none;
+    transition: transform 0.15s ease, background 0.2s, color 0.2s;
+    white-space: nowrap;
+  }
+  .btn-primary { background: var(--primary); color: var(--inverse-ink); }
+  .btn-primary:hover { background: #1a1a1a; }
+  .btn-secondary { background: var(--canvas); color: var(--ink); padding: 8px 20px 10px; border: 1px solid var(--hairline); }
+  .btn-secondary:hover { background: var(--surface-soft); }
+  .btn-magenta { background: var(--accent-magenta); color: var(--inverse-ink); padding: 10px 18px; }
+  .btn:active { transform: scale(0.97); }
+
+  /* ============= Day Strip ============= */
+  .day-strip {
+    background: var(--inverse-canvas); color: var(--inverse-ink);
+    height: 40px; display: flex; align-items: center;
+    overflow-x: auto; -webkit-overflow-scrolling: touch;
+    position: sticky; top: 60px; z-index: 99;
+  }
+  .day-strip-inner {
+    width: 100%; max-width: var(--max-content); margin: 0 auto;
+    padding: 0 var(--space-xxl);
+    display: flex; align-items: center; gap: var(--space-md);
+    font-family: var(--font-mono); font-size: 11px;
+    letter-spacing: 0.6px; text-transform: uppercase;
+    color: var(--inverse-ink); white-space: nowrap;
+  }
+  .day-strip .label { font-weight: 500; opacity: 0.85; }
+  .day-strip a {
+    color: rgba(255,255,255,0.5); text-decoration: none;
+    transition: color 0.2s;
+    padding: 4px 10px; border-radius: var(--r-pill);
+  }
+  .day-strip a:hover { color: var(--inverse-ink); }
+  .day-strip a.current {
+    color: var(--inverse-canvas);
+    background: var(--inverse-ink);
+    font-weight: 700;
+  }
+  .day-strip .sep { color: rgba(255,255,255,0.3); margin: 0 -2px; }
+
+  /* ============= Layout ============= */
+  main { max-width: var(--max-content); margin: 0 auto; padding: 0 var(--space-xxl); }
+  .day-section {
+    padding-top: var(--space-section);
+    padding-bottom: var(--space-section);
+    scroll-margin-top: 110px;
+  }
+  .day-section + .day-section { border-top: 1px solid var(--hairline-soft); }
+
+  /* ============= Color blocks ============= */
+  .block { border-radius: var(--r-lg); padding: var(--space-xxl); width: 100%; }
+  .block-cream { background: var(--block-cream); color: var(--ink); }
+  .block-mint  { background: var(--block-mint);  color: var(--ink); }
+  .block-lilac { background: var(--block-lilac); color: var(--ink); }
+  .block-lime  { background: var(--block-lime);  color: var(--ink); }
+  .block-coral { background: var(--block-coral); color: var(--ink); }
+  .block-navy  { background: var(--block-navy);  color: var(--inverse-ink); }
+  .block-pink  { background: var(--block-pink);  color: var(--ink); }
+
+  /* ============= Type Roles ============= */
+  .eyebrow {
+    font-family: var(--font-mono); font-size: 12px;
+    font-weight: 500; letter-spacing: 0.7px; text-transform: uppercase;
+    color: var(--ink); margin-bottom: var(--space-lg);
+    display: inline-flex; gap: var(--space-sm); align-items: center;
+  }
+  .eyebrow .dot { color: var(--accent-magenta); font-size: 14px; }
+  .display-xl {
+    font-family: var(--font-display); font-style: italic;
+    font-size: clamp(56px, 9vw, 110px); font-weight: 400;
+    line-height: 0.98; letter-spacing: -0.035em;
+    margin-bottom: var(--space-lg);
+  }
+  .display-lg {
+    font-family: var(--font-display); font-style: italic;
+    font-size: clamp(40px, 6vw, 72px); font-weight: 400;
+    line-height: 1.05; letter-spacing: -0.025em;
+    margin-bottom: var(--space-lg);
+  }
+  .headline {
+    font-size: 22px; font-weight: 600;
+    line-height: 1.35; letter-spacing: -0.015em;
+    margin-bottom: var(--space-md);
+  }
+  .subhead {
+    font-family: var(--font-display); font-style: italic;
+    font-size: clamp(22px, 2.6vw, 30px); font-weight: 300;
+    line-height: 1.4; letter-spacing: -0.01em;
+    margin-bottom: var(--space-md);
+  }
+  .body-lg { font-size: 19px; font-weight: 400; line-height: 1.65; letter-spacing: -0.01em; }
+  .body { font-size: 17px; font-weight: 400; line-height: 1.65; }
+  .body-sm { font-size: 15px; font-weight: 450; line-height: 1.55; }
+  .caption {
+    font-family: var(--font-mono); font-size: 12px;
+    font-weight: 400; letter-spacing: 0.6px; text-transform: uppercase;
+  }
+  .strong { font-weight: 600; }
+
+  /* ============= Hero (each day's top block) ============= */
+  .hero {
+    padding: clamp(60px, 9vw, 110px) clamp(36px, 6vw, 88px);
+  }
+  .hero h1 { max-width: 18ch; }
+  .hero .subhead { max-width: 30em; opacity: 0.85; }
+  .hero .scripture {
+    margin-top: var(--space-xl);
+    padding: var(--space-md) 0 var(--space-md) var(--space-lg);
+    border-left: 3px solid var(--ink);
+    max-width: 50em;
+  }
+  .hero .scripture p {
+    font-family: var(--font-display); font-style: italic;
+    font-size: 22px; font-weight: 400; line-height: 1.55;
+    letter-spacing: -0.01em;
+  }
+  .hero .scripture cite {
+    display: block; margin-top: var(--space-sm);
+    font-family: var(--font-mono); font-size: 12px;
+    font-weight: 500; letter-spacing: 0.5px; text-transform: uppercase;
+    font-style: normal; color: var(--ink);
+  }
+
+  /* ============= Key sentence (white between blocks) ============= */
+  .key-sentence {
+    text-align: left; padding: var(--space-section) 0 var(--space-xxl);
+  }
+  .key-sentence .eyebrow { color: var(--ink); }
+  .key-sentence h2 {
+    font-family: var(--font-display); font-style: italic;
+    font-size: clamp(32px, 4.4vw, 56px); font-weight: 400;
+    line-height: 1.18; letter-spacing: -0.02em;
+    max-width: 26ch;
+  }
+  .key-sentence .accent {
+    background-image: linear-gradient(180deg, transparent 60%, var(--block-cream) 60% 95%, transparent 95%);
+    padding: 0 4px;
+  }
+  .day-section[data-color="mint"]  .key-sentence .accent { background-image: linear-gradient(180deg, transparent 60%, var(--block-mint) 60% 95%, transparent 95%); }
+  .day-section[data-color="lilac"] .key-sentence .accent { background-image: linear-gradient(180deg, transparent 60%, var(--block-lilac) 60% 95%, transparent 95%); }
+  .day-section[data-color="lime"]  .key-sentence .accent { background-image: linear-gradient(180deg, transparent 60%, var(--block-lime) 60% 95%, transparent 95%); }
+  .day-section[data-color="coral"] .key-sentence .accent { background-image: linear-gradient(180deg, transparent 60%, var(--block-coral) 60% 95%, transparent 95%); }
+  .key-sentence p {
+    font-family: var(--font-display); font-style: italic;
+    font-size: 22px; font-weight: 300; line-height: 1.55;
+    letter-spacing: -0.01em;
+    max-width: 36em; margin-top: var(--space-lg);
+  }
+
+  /* ============= Meditation block ============= */
+  .meditation {
+    display: grid; grid-template-columns: 220px 1fr; gap: var(--space-xxl);
+    padding: var(--space-xxl); background: var(--surface-soft); border-radius: var(--r-lg);
+  }
+  .meditation .label { align-self: start; color: var(--ink); }
+  .meditation .body-lg p { margin-bottom: var(--space-md); }
+  .meditation .body-lg p:last-child { margin-bottom: 0; }
+
+  /* ============= Application block ============= */
+  .application { padding: var(--space-xxl); }
+  .application .questions { margin-top: var(--space-lg); display: grid; gap: var(--space-md); }
+  .application .q {
+    display: grid; grid-template-columns: 36px 1fr; gap: var(--space-md);
+    padding: var(--space-lg) var(--space-xl) var(--space-lg) var(--space-lg);
+    background: var(--canvas); border-radius: var(--r-md);
+    align-items: start;
+  }
+  .application .q .num {
+    font-family: var(--font-mono); font-size: 13px; font-weight: 700;
+    color: var(--ink); padding-top: 3px;
+  }
+  .application .q .text {
+    font-size: 18px; font-weight: 450; line-height: 1.55; letter-spacing: -0.01em;
+  }
+
+  /* ============= Prayer block ============= */
+  .prayer { padding: var(--space-xxl); }
+  .prayer .text {
+    font-family: var(--font-display); font-style: italic;
+    font-size: 22px; font-weight: 300; line-height: 1.6;
+    letter-spacing: -0.01em;
+    max-width: 42em;
+  }
+  .prayer .amen {
+    display: inline-block; margin-top: var(--space-lg);
+    font-family: var(--font-mono); font-size: 13px;
+    letter-spacing: 0.6px; font-style: normal;
+  }
+
+  /* ============= Next-day card ============= */
+  .next-card {
+    display: grid; grid-template-columns: 1fr auto; gap: var(--space-xl);
+    align-items: center; padding: var(--space-xl) var(--space-xxl);
+    border: 1px solid var(--hairline); border-radius: var(--r-lg);
+    margin-top: var(--space-xl);
+  }
+  .next-card .meta .caption { color: var(--ink); margin-bottom: var(--space-xs); }
+  .next-card .meta .title {
+    font-family: var(--font-display); font-style: italic;
+    font-size: 26px; font-weight: 400; line-height: 1.25; letter-spacing: -0.02em;
+  }
+  .next-card .meta .scrip {
+    font-family: var(--font-mono); font-size: 12px;
+    letter-spacing: 0.5px; text-transform: uppercase; margin-top: var(--space-xs);
+  }
+
+  /* ============= Series intro (top) ============= */
+  .series-intro {
+    padding: var(--space-section) 0 var(--space-xxl);
+  }
+  .series-intro .display-lg { max-width: 22ch; }
+  .series-intro .summary-grid {
+    display: grid; grid-template-columns: repeat(5, 1fr); gap: var(--space-md);
+    margin-top: var(--space-xxl);
+  }
+  .series-intro .day-card {
+    padding: var(--space-lg); border-radius: var(--r-lg);
+    text-decoration: none; color: var(--ink);
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+    display: flex; flex-direction: column; gap: var(--space-sm);
+    min-height: 180px;
+  }
+  .series-intro .day-card:hover { transform: translateY(-3px); box-shadow: 0 6px 24px rgba(0,0,0,0.08); }
+  .series-intro .day-card .num {
+    font-family: var(--font-mono); font-size: 11px;
+    font-weight: 700; letter-spacing: 0.6px; text-transform: uppercase;
+  }
+  .series-intro .day-card .ttl {
+    font-family: var(--font-display); font-style: italic;
+    font-size: 22px; font-weight: 400; line-height: 1.2; letter-spacing: -0.02em;
+    margin-top: auto;
+  }
+  .series-intro .day-card .scrip {
+    font-family: var(--font-mono); font-size: 11px;
+    letter-spacing: 0.5px; text-transform: uppercase; opacity: 0.8;
+  }
+  .series-intro .day-card.cream { background: var(--block-cream); }
+  .series-intro .day-card.mint  { background: var(--block-mint); }
+  .series-intro .day-card.lilac { background: var(--block-lilac); }
+  .series-intro .day-card.lime  { background: var(--block-lime); }
+  .series-intro .day-card.coral { background: var(--block-coral); }
+
+  /* ============= Footer ============= */
+  footer {
+    border-top: 1px solid var(--hairline);
+    padding: var(--space-section) var(--space-xxl);
+    margin-top: var(--space-section);
+  }
+  .footer-inner {
+    max-width: var(--max-content); margin: 0 auto;
+    display: grid; grid-template-columns: 1fr 1fr;
+    gap: var(--space-xl); align-items: end;
+  }
+  footer .wordmark {
+    font-family: var(--font-display); font-style: italic;
+    font-size: clamp(56px, 9vw, 96px); font-weight: 400;
+    letter-spacing: -0.025em; line-height: 1;
+  }
+  footer .meta {
+    text-align: right; font-family: var(--font-mono); font-size: 11px;
+    letter-spacing: 0.6px; text-transform: uppercase;
+    color: var(--ink); line-height: 2;
+  }
+
+  /* ============= Reveal on scroll ============= */
+  .reveal { opacity: 0; transform: translateY(20px); transition: opacity 0.7s ease, transform 0.7s cubic-bezier(.2,.7,.3,1); }
+  .reveal.in { opacity: 1; transform: translateY(0); }
+
+  /* ============= Today badge (auto-pinned) ============= */
+  .today-badge {
+    display: inline-flex; align-items: center; gap: var(--space-xs);
+    background: var(--accent-magenta); color: var(--inverse-ink);
+    font-family: var(--font-mono); font-size: 10px; font-weight: 500;
+    letter-spacing: 0.6px; text-transform: uppercase;
+    padding: 4px 10px; border-radius: var(--r-pill); margin-left: var(--space-sm);
+  }
+
+  /* ============= Responsive ============= */
+  @media (max-width: 833px) {
+    main { padding: 0 var(--space-md); }
+    .top-nav-inner, .day-strip-inner, .footer-inner { padding: 0 var(--space-md); }
+    .top-nav nav { display: none; }
+    .meditation { grid-template-columns: 1fr; gap: var(--space-md); }
+    .next-card { grid-template-columns: 1fr; }
+    .block { padding: var(--space-xl) var(--space-lg); }
+    .series-intro .summary-grid { grid-template-columns: 1fr 1fr; }
+    .day-strip { font-size: 10px; }
+    .day-strip-inner { gap: var(--space-sm); }
+  }
+</style>
+</head>
+<body>
+
+<!-- ============= Top Nav ============= -->
+<header class="top-nav">
+  <div class="top-nav-inner">
+    <a class="logo" href="#top">묵상<span class="dot">.</span></a>
+    <nav>
+      <a href="#day-1">Day 1</a>
+      <a href="#day-2">Day 2</a>
+      <a href="#day-3">Day 3</a>
+      <a href="#day-4">Day 4</a>
+      <a href="#day-5">Day 5</a>
+    </nav>
+    <div class="top-nav-actions">
+      <a class="btn btn-secondary" href="#intro">시리즈 소개</a>
+      <a class="btn btn-primary" href="#day-1">묵상 시작</a>
+    </div>
+  </div>
+</header>
+
+<!-- ============= Day Strip ============= -->
+<div class="day-strip">
+  <div class="day-strip-inner">
+    <span class="label">5-DAY DEVOTIONAL</span>
+    <span class="sep">·</span>
+    <a href="#day-1" data-day="1">DAY 1</a><span class="sep">·</span>
+    <a href="#day-2" data-day="2">DAY 2</a><span class="sep">·</span>
+    <a href="#day-3" data-day="3">DAY 3</a><span class="sep">·</span>
+    <a href="#day-4" data-day="4">DAY 4</a><span class="sep">·</span>
+    <a href="#day-5" data-day="5">DAY 5</a>
+  </div>
+</div>
+
+<main id="top">
+
+<!-- ============= Series Intro ============= -->
+<section class="series-intro" id="intro">
+  <div class="eyebrow"><span class="dot">●</span><span>사도신경 강해 10 · 죽으시고, 장사된 지</span></div>
+  <h1 class="display-lg">한 가족이 되신 예수님,<br/>다섯 날의 묵상.</h1>
+  <p class="body-lg" style="max-width: 36em; margin-top: var(--space-md);">
+    지난 주일 설교에서 출발한 다섯 편의 짧은 묵상입니다. 매일 한 편씩, 본문 한 구절과 한 문장,
+    그리고 짧은 글·기도로 — 청소년부 친구들이 한 주를 살아갈 수 있도록.
+  </p>
+  <div class="summary-grid">
+    <a href="#day-1" class="day-card cream">
+      <span class="num">DAY 01</span>
+      <span class="scrip">고후 8:9</span>
+      <span class="ttl">한 가족이 되신 예수님.</span>
+    </a>
+    <a href="#day-2" class="day-card mint">
+      <span class="num">DAY 02</span>
+      <span class="scrip">고후 8:9</span>
+      <span class="ttl">가난과 부요의 교환.</span>
+    </a>
+    <a href="#day-3" class="day-card lilac">
+      <span class="num">DAY 03</span>
+      <span class="scrip">갈 3:13-14</span>
+      <span class="ttl">저주를 짊어지신 예수님.</span>
+    </a>
+    <a href="#day-4" class="day-card lime">
+      <span class="num">DAY 04</span>
+      <span class="scrip">고후 5:21</span>
+      <span class="ttl">의의 전가, 새로운 신분.</span>
+    </a>
+    <a href="#day-5" class="day-card coral">
+      <span class="num">DAY 05</span>
+      <span class="scrip">롬 8:38-39</span>
+      <span class="ttl">죽음조차 끊지 못하는 사랑.</span>
+    </a>
+  </div>
+</section>
+
+<!-- ============= DAY 1 ============= -->
+<section class="day-section reveal" id="day-1" data-color="cream">
+  <div class="block block-cream hero">
+    <div class="eyebrow"><span class="dot">●</span><span id="badge-1">DAY 01 · 한 가족 되심</span></div>
+    <h2 class="display-xl">한 가족이<br/>되신 예수님.</h2>
+    <p class="subhead">예수님은 우리를 도와주신 게 아니라, 우리와 한 가족이 되셨습니다.</p>
+    <div class="scripture">
+      <p>"그리스도께서는 부요하나, 여러분을 위해서 가난하게 되셨습니다. 그것은 그의 가난으로 여러분을 부요하게 하시려는 것입니다."</p>
+      <cite>고린도후서 8:9</cite>
+    </div>
+  </div>
+  <div class="key-sentence">
+    <div class="eyebrow">오늘의 핵심</div>
+    <h3>가족이 된다는 건,<br/><span class="accent">모든 것을 함께</span> 나눈다는 뜻입니다.</h3>
+    <p>좋은 것만 나누는 사이는 가족이 아닙니다. 진짜 가족은 기쁨도 아픔도, 영광도 수치도 함께 나눕니다.</p>
+  </div>
+  <div class="meditation">
+    <div class="label caption">묵상</div>
+    <div class="body-lg">
+      <p>부모님 카드를 써본 적 있나요? 그 카드 속 돈은 부모님이 번 것이지만, 가족이라는 이유 하나로 내가 쓸 수 있습니다. 가족이 된다는 건 그런 겁니다 — 내가 일하지 않은 것까지 함께 누리는 것.</p>
+      <p>그런데 진짜 가족은 좋은 것만 나누지 않습니다. 부모님이 힘드시면 내 마음도 무겁고, 형제가 아프면 내 마음도 함께 아픕니다.</p>
+      <p>예수님이 우리에게 오신 방식이 그렇습니다. 좋은 것만 주시는 게 아니라, 우리의 모든 것 — <span class="strong">가난도, 저주도, 죄도</span> — 자기 것으로 가져가시고, 그분의 부요와 축복과 의로움을 우리에게 선물로 주셨습니다. 이것이 <span class="strong">"그리스도와의 연합"</span>입니다.</p>
+    </div>
+  </div>
+  <div class="block block-mint application" style="margin-top: var(--space-xl);">
+    <div class="eyebrow">오늘의 적용</div>
+    <h4 class="headline">한 가지만 골라, 오늘 마음에 두기.</h4>
+    <div class="questions">
+      <div class="q"><span class="num">01</span><span class="text">오늘 내가 예수님께 "가족이라서" 가져가시도록 맡길 수 있는 한 가지는 무엇입니까?</span></div>
+      <div class="q"><span class="num">02</span><span class="text">"가족이 되어 주셨다"는 표현을 들었을 때, 가장 먼저 떠오르는 장면이나 느낌은 무엇입니까?</span></div>
+    </div>
+  </div>
+  <div class="block block-lilac prayer" style="margin-top: var(--space-md);">
+    <div class="eyebrow">기도</div>
+    <p class="text">예수님,<br/>저를 돕는 분이 아니라 한 가족이 되어 주셔서 감사합니다.<br/>오늘 제 짐을 혼자 지지 않고, 당신께 가져가게 하소서.<br/>가족으로 함께 살아가는 하루가 되게 하소서.</p>
+    <span class="amen">— 아멘.</span>
+  </div>
+  <a href="#day-2" class="next-card" style="text-decoration: none; color: inherit;">
+    <div class="meta">
+      <div class="caption">내일 · DAY 02</div>
+      <div class="title">가난과 부요의 교환.</div>
+      <div class="scrip">고린도후서 8:9 · 예수님의 가난, 우리의 부요</div>
+    </div>
+    <span class="btn btn-primary">DAY 2로 →</span>
+  </a>
+</section>
+
+<!-- ============= DAY 2 ============= -->
+<section class="day-section reveal" id="day-2" data-color="mint">
+  <div class="block block-mint hero">
+    <div class="eyebrow"><span class="dot">●</span><span>DAY 02 · 부요와 가난의 교환</span></div>
+    <h2 class="display-xl">가난과<br/>부요의 교환.</h2>
+    <p class="subhead">그분이 가난해지셨기에, 나는 부요해졌습니다.</p>
+    <div class="scripture">
+      <p>"그리스도께서는 부요하나, 여러분을 위해서 가난하게 되셨습니다. 그것은 그의 가난으로 여러분을 부요하게 하시려는 것입니다."</p>
+      <cite>고린도후서 8:9</cite>
+    </div>
+  </div>
+  <div class="key-sentence">
+    <div class="eyebrow">오늘의 핵심</div>
+    <h3>도와주신 게 아니라,<br/><span class="accent">내 자리에 직접 내려오셨습니다.</span></h3>
+    <p>부유한 분이 가난한 사람을 도와주는 것과, 부유한 분이 가난한 자리에 직접 내려오시는 것은 다른 이야기입니다.</p>
+  </div>
+  <div class="meditation">
+    <div class="label caption">묵상</div>
+    <div class="body-lg">
+      <p>예수님은 후원자가 아니라 우리 자리에 직접 내려오신 분입니다. 그분이 가난하셨기에 우리는 부요해졌고, 그분이 낮아지셨기에 우리는 높여졌습니다.</p>
+      <p>가난은 단지 돈이 없는 것만 아닙니다. <span class="strong">사랑받지 못함, 인정받지 못함, 안전감의 부재</span> — 이 모든 가난을 그분이 먼저 지나가셨습니다.</p>
+      <p>그래서 내가 가진 어떤 결핍도, 예수님께는 낯설지 않습니다. 그분은 그 자리에서 손을 내미십니다 — "나도 거기 있었다"고.</p>
+    </div>
+  </div>
+  <div class="block block-lilac application" style="margin-top: var(--space-xl);">
+    <div class="eyebrow">오늘의 적용</div>
+    <h4 class="headline">내 안의 "가난"을 한 단어로 적어보기.</h4>
+    <div class="questions">
+      <div class="q"><span class="num">01</span><span class="text">내가 지금 느끼는 "가난"은 무엇입니까? 그것이 예수님이 이미 지나가신 자리임을 떠올려 보세요.</span></div>
+      <div class="q"><span class="num">02</span><span class="text">오늘 누군가에게 "내가 가진 부요"를 작은 형태로라도 나눌 수 있는 한 가지는 무엇입니까?</span></div>
+    </div>
+  </div>
+  <div class="block block-cream prayer" style="margin-top: var(--space-md);">
+    <div class="eyebrow">기도</div>
+    <p class="text">예수님,<br/>저를 위해 가난해지신 그 사랑을 묵상합니다.<br/>오늘 제 결핍의 자리에 당신이 먼저 와 계셨음을 기억하게 하소서.<br/>그리고 저도 누군가에게 작은 부요를 흘려보내게 하소서.</p>
+    <span class="amen">— 아멘.</span>
+  </div>
+  <a href="#day-3" class="next-card" style="text-decoration: none; color: inherit;">
+    <div class="meta">
+      <div class="caption">내일 · DAY 03</div>
+      <div class="title">저주를 짊어지신 예수님.</div>
+      <div class="scrip">갈라디아서 3:13-14 · 십자가의 저주, 우리의 축복</div>
+    </div>
+    <span class="btn btn-primary">DAY 3으로 →</span>
+  </a>
+</section>
+
+<!-- ============= DAY 3 ============= -->
+<section class="day-section reveal" id="day-3" data-color="lilac">
+  <div class="block block-lilac hero">
+    <div class="eyebrow"><span class="dot">●</span><span>DAY 03 · 저주의 자리</span></div>
+    <h2 class="display-xl">저주를<br/>짊어지신 예수님.</h2>
+    <p class="subhead">가장 큰 저주의 자리에 그분이 가셨기에, 가장 큰 축복이 내게 흘러옵니다.</p>
+    <div class="scripture">
+      <p>"그리스도께서 우리를 위하여 저주를 받은 사람이 되심으로써, 우리를 율법의 저주에서 속량해 주셨습니다… 아브라함에게 내리신 복을 그리스도 예수 안에서 이방 사람에게 미치게 하시려는 것입니다."</p>
+      <cite>갈라디아서 3:13-14</cite>
+    </div>
+  </div>
+  <div class="key-sentence">
+    <div class="eyebrow">오늘의 핵심</div>
+    <h3>예수님은 두려운 자리에<br/><span class="accent">먼저 가신 분</span>입니다.</h3>
+    <p>그분이 통과하지 않은 어둠은 이제 없습니다. 우리가 두려워하는 곳마다, 그분의 발자국이 먼저 새겨져 있습니다.</p>
+  </div>
+  <div class="meditation">
+    <div class="label caption">묵상</div>
+    <div class="body-lg">
+      <p>십자가는 단순한 처형 도구가 아니었습니다. 당시 사람들에게 그것은 "저 사람은 하나님께 버림받았다"라는 가장 큰 모욕이자 저주였습니다.</p>
+      <p>그 자리에 예수님이 가셨습니다. 자기 잘못이 하나도 없으셨는데도 — <span class="strong">우리가 받아야 할 저주를 자기 등에 지셨습니다.</span></p>
+      <p>우리가 두려워하는 것 — 거절, 실패, 버림받음 — 그 모든 그늘을 그분이 먼저 통과하셨기에, 우리는 이제 정죄가 아닌 축복 안에서 살게 됩니다.</p>
+    </div>
+  </div>
+  <div class="block block-coral application" style="margin-top: var(--space-xl);">
+    <div class="eyebrow">오늘의 적용</div>
+    <h4 class="headline">내 안의 "버림받음"의 그림자를 마주하기.</h4>
+    <div class="questions">
+      <div class="q"><span class="num">01</span><span class="text">내가 두려워하는 "버림받음"의 형태는 무엇입니까? 그 자리에도 예수님이 먼저 가셨다는 사실이 위로가 됩니까?</span></div>
+      <div class="q"><span class="num">02</span><span class="text">오늘 내가 누군가의 "저주" — 외로움이나 수치 — 를 조금이라도 함께 짊어질 수 있다면 무엇입니까?</span></div>
+    </div>
+  </div>
+  <div class="block block-mint prayer" style="margin-top: var(--space-md);">
+    <div class="eyebrow">기도</div>
+    <p class="text">예수님,<br/>가장 깊은 어둠의 자리에 먼저 가셔서 감사합니다.<br/>제가 두려워하는 곳마다 당신의 발자국이 먼저 새겨져 있음을 보게 하소서.<br/>오늘 그 발자국을 따라 한 걸음 내딛게 하소서.</p>
+    <span class="amen">— 아멘.</span>
+  </div>
+  <a href="#day-4" class="next-card" style="text-decoration: none; color: inherit;">
+    <div class="meta">
+      <div class="caption">내일 · DAY 04</div>
+      <div class="title">의의 전가, 새로운 신분.</div>
+      <div class="scrip">고린도후서 5:21 · 죄와 의의 교환</div>
+    </div>
+    <span class="btn btn-primary">DAY 4로 →</span>
+  </a>
+</section>
+
+<!-- ============= DAY 4 ============= -->
+<section class="day-section reveal" id="day-4" data-color="lime">
+  <div class="block block-lime hero">
+    <div class="eyebrow"><span class="dot">●</span><span>DAY 04 · 새 신분</span></div>
+    <h2 class="display-xl">의의 전가,<br/>새로운 신분.</h2>
+    <p class="subhead">내가 의로워진 게 아니라, 그분의 의로움이 내게 입혀졌습니다.</p>
+    <div class="scripture">
+      <p>"하나님께서는 죄를 모르시는 분에게 우리 대신으로 죄를 씌우셨습니다. 그것은 우리가 그리스도 안에서 하나님의 의가 되게 하시려는 것입니다."</p>
+      <cite>고린도후서 5:21</cite>
+    </div>
+  </div>
+  <div class="key-sentence">
+    <div class="eyebrow">오늘의 핵심</div>
+    <h3>하나님은 내가 한 일이 아니라,<br/><span class="accent">예수님이 하신 일</span>을 보십니다.</h3>
+    <p>이건 거래가 아닙니다. 가족 안에서의 교환입니다. 내 신분은 내 행위 위가 아니라, 그분 안에 세워졌습니다.</p>
+  </div>
+  <div class="meditation">
+    <div class="label caption">묵상</div>
+    <div class="body-lg">
+      <p>"내가 노력해서 깨끗해지면 하나님이 받아주시겠지" — 우리는 자주 이렇게 생각합니다. 그러나 본문은 정반대로 말합니다.</p>
+      <p>죄가 전혀 없으신 분이 우리 자리에 죄인으로 서셨고, 그래서 죄 많은 우리가 그분 안에서 의로운 사람이 되었습니다. <span class="strong">이것은 거래가 아니라 가족의 교환입니다.</span></p>
+      <p>하나님은 이제 우리를 볼 때, 우리가 한 일이 아니라 예수님이 하신 일을 보십니다. 이 신분의 변화 위에 우리의 매일이 세워집니다.</p>
+    </div>
+  </div>
+  <div class="block block-cream application" style="margin-top: var(--space-xl);">
+    <div class="eyebrow">오늘의 적용</div>
+    <h4 class="headline">"내 의로움"을 내려놓는 한 순간.</h4>
+    <div class="questions">
+      <div class="q"><span class="num">01</span><span class="text">오늘 내가 "내 의로움"으로 평가받지 않고 "그분의 의로움" 안에서 산다면, 무엇이 가장 가벼워질까요?</span></div>
+      <div class="q"><span class="num">02</span><span class="text">누군가를 그의 행동이 아니라 "예수님 안의 신분"으로 봐주는 한 번의 시선을 가져 보세요.</span></div>
+    </div>
+  </div>
+  <div class="block block-coral prayer" style="margin-top: var(--space-md);">
+    <div class="eyebrow">기도</div>
+    <p class="text">예수님,<br/>제가 한 일이 아니라 당신이 하신 일을 의지하게 하소서.<br/>오늘 누군가를 평가가 아닌 사랑의 시선으로 바라보게 하소서.<br/>당신 안의 새 신분으로 살게 하소서.</p>
+    <span class="amen">— 아멘.</span>
+  </div>
+  <a href="#day-5" class="next-card" style="text-decoration: none; color: inherit;">
+    <div class="meta">
+      <div class="caption">내일 · DAY 05 · 마지막 날</div>
+      <div class="title">죽음조차 끊지 못하는 사랑.</div>
+      <div class="scrip">로마서 8:38-39 · 우리는 끊어지지 않는다</div>
+    </div>
+    <span class="btn btn-primary">DAY 5로 →</span>
+  </a>
+</section>
+
+<!-- ============= DAY 5 ============= -->
+<section class="day-section reveal" id="day-5" data-color="coral">
+  <div class="block block-coral hero">
+    <div class="eyebrow"><span class="dot">●</span><span>DAY 05 · 끊어지지 않는 사랑</span></div>
+    <h2 class="display-xl">죽음조차<br/>끊지 못하는 사랑.</h2>
+    <p class="subhead">그분이 죽음의 자리까지 가셨기에, 그곳도 더는 우리를 끊지 못합니다.</p>
+    <div class="scripture">
+      <p>"나는 확신합니다. 죽음도, 삶도… 그 어떤 피조물도, 우리를 우리 주 예수 그리스도 안에 있는 하나님의 사랑에서 끊을 수 없습니다."</p>
+      <cite>로마서 8:38-39</cite>
+    </div>
+  </div>
+  <div class="key-sentence">
+    <div class="eyebrow">오늘의 핵심</div>
+    <h3>예수님이 먼저 가신 자리는,<br/><span class="accent">더 이상 우리를 끊지 못합니다.</span></h3>
+    <p>외로움도, 실패도, 두려움도 — 그분이 먼저 그곳을 지나가셨기 때문입니다.</p>
+  </div>
+  <div class="meditation">
+    <div class="label caption">묵상</div>
+    <div class="body-lg">
+      <p>예수님의 죽음은 연극이 아니었습니다. <span class="strong">진짜로 심장이 멈추고, 무덤에 묻히신 사건입니다.</span> 왜 그렇게까지 가셨을까요? 우리와 완전히 하나가 되시기 위해서입니다.</p>
+      <p>2세기 신학자 이레나이우스는 말했습니다 — <em>"그분은 죽은 자들 중에 가장 먼저 살아나셔서 모든 것의 으뜸이 되셨다."</em></p>
+      <p>외로움, 실패, 불안, 두려움 — 우리가 가는 모든 자리에 예수님은 먼저 가셨고, 거기서 우리에게 손을 내미십니다. 죽음조차도 그분의 사랑에서 우리를 끊지 못합니다.</p>
+      <p>이 한 주의 묵상이 끝이 아니라, 일상의 시작이 되기를.</p>
+    </div>
+  </div>
+  <div class="block block-lime application" style="margin-top: var(--space-xl);">
+    <div class="eyebrow">한 주를 마무리하며</div>
+    <h4 class="headline">한 주의 묵상에서 한 가지를 챙겨가기.</h4>
+    <div class="questions">
+      <div class="q"><span class="num">01</span><span class="text">이번 한 주 묵상을 통해 "예수님이 먼저 가신 자리"라는 표현이 가장 깊이 와닿은 순간은 언제였습니까?</span></div>
+      <div class="q"><span class="num">02</span><span class="text">다음 한 주, 어떤 한 가지 영역에서 이 진리를 살아내고 싶습니까?</span></div>
+    </div>
+  </div>
+  <div class="block block-navy prayer" style="margin-top: var(--space-md);">
+    <div class="eyebrow" style="color: var(--inverse-ink);">마지막 기도</div>
+    <p class="text" style="color: var(--inverse-ink);">예수님,<br/>죽음의 자리까지 가신 그 사랑이<br/>제 매일의 자리가 되게 하소서.<br/>이 한 주 묵상이 끝이 아니라, 일상의 시작이 되게 하소서.</p>
+    <span class="amen" style="color: var(--inverse-ink);">— 아멘.</span>
+  </div>
+</section>
+
+</main>
+
+<footer>
+  <div class="footer-inner">
+    <div class="wordmark">묵상.</div>
+    <div class="meta">
+      사도신경 강해 10 · 죽으시고, 장사된 지<br/>
+      청소년부 · 5일 묵상 시리즈 · 2026<br/>
+      <span style="opacity: 0.5;">— 본 자료는 한 주간의 동행을 위해 만들어졌습니다.</span>
+    </div>
+  </div>
+</footer>
+
+<script>
+  // Reveal-on-scroll
+  const io = new IntersectionObserver(entries => {
+    entries.forEach(e => {
+      if (e.isIntersecting) {
+        e.target.classList.add("in");
+        io.unobserve(e.target);
+      }
+    });
+  }, { threshold: 0.12 });
+  document.querySelectorAll(".reveal").forEach(el => io.observe(el));
+
+  // Day strip — highlight current section as user scrolls
+  const dayLinks = document.querySelectorAll(".day-strip a[data-day]");
+  const sections = document.querySelectorAll(".day-section");
+  const sectIO = new IntersectionObserver(entries => {
+    entries.forEach(e => {
+      if (e.isIntersecting) {
+        const id = e.target.id;
+        dayLinks.forEach(a => {
+          a.classList.toggle("current", a.getAttribute("href") === "#" + id);
+        });
+      }
+    });
+  }, { rootMargin: "-40% 0px -55% 0px", threshold: 0 });
+  sections.forEach(s => sectIO.observe(s));
+
+  // Auto-pin "today" — if today is within the 5-day window from publish date,
+  // mark today's day with a magenta badge.
+  // Publish date: 2026-01-25 (Sunday). Day N runs N-1 days after.
+  const PUBLISH_DATE = new Date("2026-01-25T00:00:00");
+  const today = new Date();
+  const daysSince = Math.floor((today - PUBLISH_DATE) / (1000 * 60 * 60 * 24));
+  if (daysSince >= 0 && daysSince <= 4) {
+    const dayN = daysSince + 1;
+    const badge = document.getElementById("badge-" + dayN);
+    if (badge) {
+      const span = document.createElement("span");
+      span.className = "today-badge";
+      span.textContent = "TODAY";
+      badge.parentElement.appendChild(span);
+    }
+  }
+</script>
+
+</body>
+</html>
