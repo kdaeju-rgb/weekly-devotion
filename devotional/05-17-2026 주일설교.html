@@ -1,0 +1,740 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>5일 묵상 — Gospel VS Spell (사도행전 8장)</title>
+<link href="https://fonts.googleapis.com/css2?family=Nanum+Myeongjo:wght@400;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/suit@3.0.1/dist/suit.css">
+<style>
+  :root {
+    --primary: #cc785c;
+    --canvas: #faf9f5;
+    --card: #efe9de;
+    --dark: #181715;
+    --ink: #141413;
+    --body: #3d3d3a;
+    --muted: #6c6a64;
+    --on-dark: #faf9f5;
+    --on-dark-soft: #a09d96;
+    --hairline: #e6dfd8;
+    --font-display: "Nanum Myeongjo", "NanumMyeongjo", "Noto Serif KR", Georgia, serif;
+    --font-sans: "SUIT", "SUIT Variable", -apple-system, BlinkMacSystemFont, "Apple SD Gothic Neo", system-ui, sans-serif;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body { height: 100%; overflow: hidden; font-family: var(--font-sans); background: #1a1a1a; -webkit-font-smoothing: antialiased; }
+  .label, .display-xl, .display-lg, .display-md, .subhead, .body,
+  .key-pull, .scripture .quote, .scripture .cite, .qtext, .qnum, .prayer-text,
+  .day-tile .ttl, .day-tile .num, .day-tile .scrip, .corner, .amen {
+    word-break: keep-all; overflow-wrap: break-word;
+  }
+
+  .stage {
+    position: fixed; inset: 0;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .deck {
+    position: relative;
+    aspect-ratio: 16 / 9;
+    width: 100vw; height: auto;
+    max-height: 100vh;
+    background: var(--canvas);
+    overflow: hidden;
+  }
+  @supports not (aspect-ratio: 16 / 9) {
+    .deck { width: 100vw; height: 56.25vw; }
+  }
+
+  .reel { position: relative; width: 100%; height: 100%; perspective: 1800px; transform-style: preserve-3d; }
+  .slide {
+    position: absolute; inset: 0;
+    display: flex; align-items: center;
+    padding: clamp(28px, 4.5vh, 60px) clamp(36px, 5.5vw, 90px);
+    opacity: 0; pointer-events: none;
+    transform: translateX(100%);
+    overflow: auto;
+  }
+  .slide.is-animating { transition: transform 0.6s cubic-bezier(.65,0,.2,1), opacity 0.5s ease; }
+  .slide.is-current { opacity: 1; pointer-events: auto; transform: translateX(0); z-index: 2; }
+  .slide.is-prev { transform: translateX(-100%); opacity: 1; }
+  .slide.is-next { transform: translateX(100%); opacity: 1; }
+
+  .bg-canvas { background: var(--canvas); color: var(--ink); }
+  .bg-card { background: var(--card); color: var(--ink); }
+  .bg-dark { background: var(--dark); color: var(--on-dark); }
+
+  .slide-inner { width: 100%; max-width: 1200px; margin: 0 auto; }
+  .two-col { display: grid; grid-template-columns: 1.05fr 1fr; gap: clamp(28px, 4vw, 60px); align-items: center; }
+
+  .label {
+    font-family: var(--font-sans); font-weight: 700;
+    font-size: clamp(16px, 1.4vw, 21px); letter-spacing: 0.08em;
+    text-transform: uppercase; color: var(--muted);
+    margin-bottom: 26px;
+  }
+  .bg-dark .label { color: var(--on-dark-soft); }
+
+  .display-xl {
+    font-family: var(--font-display); font-weight: 800;
+    font-size: clamp(44px, 5.8vw, 82px);
+    line-height: 1.10; letter-spacing: -0.025em;
+    margin-bottom: 20px;
+  }
+  .display-lg {
+    font-family: var(--font-display); font-weight: 800;
+    font-size: clamp(38px, 4.6vw, 64px);
+    line-height: 1.12; letter-spacing: -0.022em;
+    margin-bottom: 18px;
+  }
+  .display-md {
+    font-family: var(--font-display); font-weight: 800;
+    font-size: clamp(32px, 3.6vw, 50px);
+    line-height: 1.22; letter-spacing: -0.018em;
+    margin-bottom: 16px;
+  }
+  .subhead {
+    font-family: var(--font-sans); font-weight: 500;
+    font-size: clamp(20px, 2vw, 27px);
+    line-height: 1.5; letter-spacing: -0.01em;
+    color: var(--body); margin-bottom: 24px;
+  }
+  .bg-dark .subhead { color: var(--on-dark-soft); }
+
+  .body {
+    font-family: var(--font-sans); font-weight: 400;
+    font-size: clamp(18px, 1.7vw, 23px);
+    line-height: 1.7; letter-spacing: -0.005em;
+    color: var(--body);
+  }
+  .bg-dark .body { color: var(--on-dark-soft); }
+  .strong { font-weight: 600; color: var(--ink); }
+  .bg-dark .strong { color: var(--on-dark); }
+
+  .scripture {
+    margin-top: 24px;
+    padding-left: 20px;
+    border-left: 4px solid var(--primary);
+  }
+  .scripture .quote {
+    font-family: var(--font-display); font-weight: 700;
+    font-size: clamp(22px, 2.3vw, 30px);
+    line-height: 1.42; letter-spacing: -0.012em;
+  }
+  .scripture .cite {
+    margin-top: 12px;
+    font-family: var(--font-sans); font-weight: 700;
+    font-size: clamp(15px, 1.3vw, 19px); letter-spacing: 0.07em;
+    text-transform: uppercase; color: var(--muted);
+  }
+  .bg-dark .scripture .cite { color: var(--on-dark-soft); }
+
+  .key-pull {
+    font-family: var(--font-display); font-weight: 800;
+    font-size: clamp(34px, 4vw, 56px);
+    line-height: 1.22; letter-spacing: -0.022em;
+    margin-bottom: 24px;
+  }
+
+  .qline { display: grid; grid-template-columns: 64px 1fr; gap: 18px; padding: 16px 0; align-items: baseline; }
+  .qline + .qline { border-top: 1px solid var(--hairline); }
+  .bg-dark .qline + .qline { border-top: 1px solid rgba(255,255,255,0.08); }
+  .qnum {
+    font-family: var(--font-sans); font-weight: 700;
+    font-size: clamp(16px, 1.4vw, 20px); letter-spacing: 0.08em;
+    color: var(--primary);
+  }
+  .qtext {
+    font-family: var(--font-sans); font-weight: 500;
+    font-size: clamp(19px, 1.8vw, 24px); line-height: 1.58; letter-spacing: -0.005em;
+  }
+
+  .prayer-text {
+    font-family: var(--font-display); font-weight: 700;
+    font-size: clamp(26px, 2.7vw, 36px);
+    line-height: 1.48; letter-spacing: -0.018em;
+  }
+  .prayer-divider { width: 72px; height: 3px; background: var(--primary); margin: 34px 0 26px; }
+  .amen {
+    display: inline-block; margin-top: 20px;
+    font-family: var(--font-sans); font-weight: 700;
+    font-size: clamp(16px, 1.3vw, 19px); letter-spacing: 0.1em;
+    color: var(--muted);
+  }
+  .bg-dark .amen { color: var(--on-dark-soft); }
+
+  .day-illustration { width: 100%; max-width: 480px; aspect-ratio: 1 / 1; }
+  .day-illustration svg { width: 100%; height: 100%; display: block; }
+
+  .day-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 14px; margin-top: 32px; max-width: 1100px; }
+  .day-tile {
+    padding: 22px 18px; border-radius: 14px;
+    border: 1px solid var(--hairline); background: var(--canvas);
+    display: flex; flex-direction: column; gap: 8px; min-height: 200px;
+    transition: border-color 0.2s ease, transform 0.2s ease;
+    cursor: pointer;
+  }
+  .day-tile:hover { border-color: var(--primary); transform: translateY(-2px); }
+  .day-tile:focus-visible { outline: 2px solid var(--primary); outline-offset: 3px; }
+  .day-tile:active { transform: translateY(0); }
+  .day-tile .num { font-family: var(--font-sans); font-weight: 700; font-size: 14px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--primary); }
+  .day-tile .scrip { font-family: var(--font-sans); font-weight: 700; font-size: 13px; letter-spacing: 0.06em; text-transform: uppercase; color: var(--muted); }
+  .day-tile .ttl { font-family: var(--font-display); font-weight: 800; font-size: 24px; line-height: 1.2; letter-spacing: -0.018em; margin-top: auto; }
+
+  .corner {
+    position: absolute; bottom: 20px; z-index: 5;
+    font-family: var(--font-sans); font-weight: 700;
+    font-size: 14px; letter-spacing: 0.08em; text-transform: uppercase;
+    color: var(--muted); pointer-events: none;
+  }
+  .bg-dark .corner { color: var(--on-dark-soft); }
+  .corner.left { left: clamp(28px, 5vw, 60px); }
+  .corner.right { right: clamp(28px, 5vw, 60px); font-variant-numeric: tabular-nums; }
+
+  .nav-zone { position: absolute; top: 0; bottom: 0; width: 18%; z-index: 30; cursor: pointer; }
+  .nav-zone.left { left: 0; }
+  .nav-zone.right { right: 0; }
+  .nav-zone .arrow {
+    position: absolute; top: 50%; transform: translateY(-50%);
+    width: 44px; height: 44px; border-radius: 8px;
+    background: rgba(20,20,19,0.06); color: var(--ink);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 18px; opacity: 0; transition: opacity 0.25s;
+  }
+  .nav-zone.left .arrow { left: 16px; }
+  .nav-zone.right .arrow { right: 16px; }
+  .nav-zone:hover .arrow { opacity: 1; }
+  .deck.dark-mode .nav-zone .arrow { background: rgba(255,255,255,0.12); color: var(--on-dark); }
+
+  .build { opacity: 0; transform: translateY(12px); transition: opacity 0.5s ease, transform 0.5s cubic-bezier(.2,.7,.3,1); }
+  .slide.is-current .build { opacity: 1; transform: translateY(0); }
+  .slide.is-current .build:nth-of-type(1) { transition-delay: 0.08s; }
+  .slide.is-current .build:nth-of-type(2) { transition-delay: 0.18s; }
+  .slide.is-current .build:nth-of-type(3) { transition-delay: 0.28s; }
+  .slide.is-current .build:nth-of-type(4) { transition-delay: 0.38s; }
+
+  @media (max-width: 833px) {
+    .stage { background: var(--canvas); }
+    .deck {
+      aspect-ratio: auto;
+      width: 100vw;
+      height: 100dvh;
+      max-height: 100dvh;
+    }
+    @supports not (height: 100dvh) {
+      .deck { height: 100vh; max-height: 100vh; }
+    }
+    .slide {
+      padding: 56px 20px calc(72px + env(safe-area-inset-bottom));
+      align-items: flex-start;
+    }
+    .two-col { grid-template-columns: 1fr; gap: 22px; align-items: start; }
+    .day-illustration { max-width: 180px; margin: 8px auto 0; order: 2; }
+    .day-grid {
+      grid-template-columns: 1fr;
+      gap: 10px; margin-top: 22px; max-width: 100%;
+    }
+    .day-tile {
+      min-height: auto;
+      flex-direction: row; align-items: center; gap: 12px;
+      padding: 16px 18px;
+    }
+    .day-tile .ttl { margin-top: 0; font-size: 18px; flex: 1; }
+    .day-tile .num, .day-tile .scrip { font-size: 11px; white-space: nowrap; }
+    .corner {
+      font-size: 11px;
+      bottom: calc(20px + env(safe-area-inset-bottom));
+      letter-spacing: 0.06em;
+    }
+    .corner.left { left: 16px; max-width: 60%; }
+    .corner.right { right: 16px; }
+    .nav-zone { width: 14%; }
+    .nav-zone .arrow { width: 36px; height: 36px; font-size: 16px; }
+    .display-xl { font-size: clamp(38px, 9vw, 56px); }
+    .display-lg { font-size: clamp(34px, 8vw, 48px); }
+    .display-md { font-size: clamp(28px, 7vw, 40px); }
+    .key-pull { font-size: clamp(28px, 7vw, 38px); }
+    .subhead { font-size: clamp(18px, 4.6vw, 22px); }
+    .body { font-size: clamp(16px, 4.2vw, 19px); }
+    .scripture .quote { font-size: clamp(19px, 4.8vw, 24px); }
+    .scripture .cite { font-size: clamp(13px, 3.4vw, 16px); }
+    .qtext { font-size: clamp(17px, 4.4vw, 20px); }
+    .qnum { font-size: clamp(14px, 3.6vw, 17px); }
+    .prayer-text { font-size: clamp(22px, 5.8vw, 28px); }
+    .label { font-size: clamp(13px, 3.4vw, 17px); }
+  }
+  @media (max-width: 833px) and (orientation: landscape) {
+    .slide { padding: 24px 32px 40px; }
+    .two-col { grid-template-columns: 1.1fr 1fr; gap: 18px; }
+    .day-illustration { max-width: 220px; order: 0; }
+  }
+</style>
+</head>
+<body>
+
+<svg width="0" height="0" style="position:absolute;">
+  <defs>
+    <!-- Day 1: 흩어진 씨앗들 — 박해가 복음 확장의 도구 -->
+    <symbol id="day1-svg" viewBox="0 0 1024 1024">
+      <circle cx="512" cy="512" r="30" fill="#cc785c"/>
+      <path d="M 512 512 Q 400 380 280 300" stroke="#cc785c" stroke-width="4" fill="none" stroke-linecap="round"/>
+      <path d="M 512 512 Q 640 360 780 300" stroke="#cc785c" stroke-width="4" fill="none" stroke-linecap="round"/>
+      <path d="M 512 512 Q 700 512 860 470" stroke="#cc785c" stroke-width="4" fill="none" stroke-linecap="round"/>
+      <path d="M 512 512 Q 520 680 490 840" stroke="#cc785c" stroke-width="4" fill="none" stroke-linecap="round"/>
+      <path d="M 512 512 Q 320 580 180 520" stroke="#cc785c" stroke-width="4" fill="none" stroke-linecap="round"/>
+      <circle cx="280" cy="300" r="18" fill="#cc785c" opacity="0.7"/>
+      <circle cx="780" cy="300" r="18" fill="#cc785c" opacity="0.7"/>
+      <circle cx="860" cy="470" r="18" fill="#cc785c" opacity="0.7"/>
+      <circle cx="490" cy="840" r="18" fill="#cc785c" opacity="0.7"/>
+      <circle cx="180" cy="520" r="18" fill="#cc785c" opacity="0.7"/>
+    </symbol>
+    <!-- Day 2: Gospel vs Spell — 빛이 어둠을 압도 -->
+    <symbol id="day2-svg" viewBox="0 0 1024 1024">
+      <circle cx="300" cy="512" r="200" stroke="#cc785c" stroke-width="3" fill="none" opacity="0.22" stroke-dasharray="12 20"/>
+      <circle cx="300" cy="512" r="110" stroke="#cc785c" stroke-width="3" fill="none" opacity="0.18" stroke-dasharray="8 14"/>
+      <circle cx="300" cy="512" r="36" stroke="#cc785c" stroke-width="3" fill="none" opacity="0.15"/>
+      <circle cx="720" cy="512" r="28" fill="#cc785c"/>
+      <circle cx="720" cy="512" r="85" stroke="#cc785c" stroke-width="4" fill="none" opacity="0.65"/>
+      <circle cx="720" cy="512" r="160" stroke="#cc785c" stroke-width="3" fill="none" opacity="0.4"/>
+      <circle cx="720" cy="512" r="235" stroke="#cc785c" stroke-width="2" fill="none" opacity="0.22"/>
+      <line x1="512" y1="240" x2="512" y2="784" stroke="#cc785c" stroke-width="1.5" stroke-linecap="round" opacity="0.18" stroke-dasharray="5 12"/>
+    </symbol>
+    <!-- Day 3: 말씀이 삶에 닿다 — 수직선이 수평선과 만나는 -->
+    <symbol id="day3-svg" viewBox="0 0 1024 1024">
+      <line x1="160" y1="620" x2="864" y2="620" stroke="#cc785c" stroke-width="4" stroke-linecap="round" opacity="0.42"/>
+      <line x1="512" y1="160" x2="512" y2="620" stroke="#cc785c" stroke-width="5" stroke-linecap="round"/>
+      <circle cx="512" cy="620" r="26" fill="#cc785c"/>
+      <circle cx="512" cy="620" r="75" stroke="#cc785c" stroke-width="2.5" fill="none" opacity="0.5"/>
+      <circle cx="512" cy="620" r="140" stroke="#cc785c" stroke-width="2" fill="none" opacity="0.3"/>
+      <circle cx="512" cy="620" r="215" stroke="#cc785c" stroke-width="1.5" fill="none" opacity="0.16"/>
+    </symbol>
+    <!-- Day 4: 성령은 소유가 아님 — 돈이 막히다 -->
+    <symbol id="day4-svg" viewBox="0 0 1024 1024">
+      <circle cx="280" cy="460" r="60" stroke="#cc785c" stroke-width="4" fill="none" opacity="0.55"/>
+      <circle cx="330" cy="540" r="60" stroke="#cc785c" stroke-width="4" fill="none" opacity="0.4"/>
+      <circle cx="220" cy="560" r="60" stroke="#cc785c" stroke-width="4" fill="none" opacity="0.3"/>
+      <line x1="512" y1="220" x2="512" y2="800" stroke="#cc785c" stroke-width="7" stroke-linecap="round"/>
+      <line x1="477" y1="477" x2="547" y2="547" stroke="#cc785c" stroke-width="4" stroke-linecap="round"/>
+      <line x1="547" y1="477" x2="477" y2="547" stroke="#cc785c" stroke-width="4" stroke-linecap="round"/>
+      <path d="M 700 780 Q 660 620 700 480 Q 730 580 750 460 Q 790 580 770 780" stroke="#cc785c" stroke-width="4" fill="none" stroke-linecap="round"/>
+      <circle cx="728" cy="410" r="16" fill="#cc785c" opacity="0.8"/>
+      <circle cx="735" cy="350" r="10" fill="#cc785c" opacity="0.5"/>
+      <circle cx="740" cy="300" r="6" fill="#cc785c" opacity="0.3"/>
+    </symbol>
+    <!-- Day 5: 함께 짊어지는 신앙 — 십자가 앞에 무릎 꿇은 인물 -->
+    <symbol id="day5-svg" viewBox="0 0 1024 1024">
+      <line x1="512" y1="160" x2="512" y2="680" stroke="#cc785c" stroke-width="6" stroke-linecap="round"/>
+      <line x1="310" y1="310" x2="714" y2="310" stroke="#cc785c" stroke-width="6" stroke-linecap="round"/>
+      <circle cx="512" cy="760" r="26" stroke="#cc785c" stroke-width="4" fill="none"/>
+      <path d="M 512 786 Q 490 850 460 890" stroke="#cc785c" stroke-width="4" fill="none" stroke-linecap="round"/>
+      <path d="M 512 786 Q 534 850 564 890" stroke="#cc785c" stroke-width="4" fill="none" stroke-linecap="round"/>
+      <path d="M 512 786 Q 448 730 460 690" stroke="#cc785c" stroke-width="3.5" fill="none" stroke-linecap="round"/>
+      <path d="M 512 786 Q 576 730 564 690" stroke="#cc785c" stroke-width="3.5" fill="none" stroke-linecap="round"/>
+    </symbol>
+  </defs>
+</svg>
+
+<div class="stage">
+  <div class="deck" id="deck">
+    <div class="corner left">Gospel VS Spell · 5일 묵상</div>
+    <div class="corner right"><span id="curIdx">1</span> / <span id="totIdx">16</span></div>
+    <div class="nav-zone left" id="navLeft"><div class="arrow">←</div></div>
+    <div class="nav-zone right" id="navRight"><div class="arrow">→</div></div>
+
+    <div class="reel" id="reel">
+
+      <!-- 0. Series intro -->
+      <section class="slide bg-canvas" data-bg="light">
+        <div class="slide-inner">
+          <div class="label build">사도행전 8장 · 5일 묵상</div>
+          <h1 class="display-lg build">Gospel VS Spell</h1>
+          <p class="body build" style="margin-top: 8px;">
+            매일 한 편씩 — 본문 한 구절, 핵심 한 문장, 짧은 묵상글과 기도. 한 주를 함께 살아갑니다.
+          </p>
+          <div class="day-grid build">
+            <div class="day-tile" data-goto="1" role="button" tabindex="0">
+              <span class="num">DAY 01</span>
+              <span class="scrip">행 8:4</span>
+              <span class="ttl">흩어진 자리에서.</span>
+            </div>
+            <div class="day-tile" data-goto="4" role="button" tabindex="0">
+              <span class="num">DAY 02</span>
+              <span class="scrip">행 8:12</span>
+              <span class="ttl">Gospel이 이깁니다.</span>
+            </div>
+            <div class="day-tile" data-goto="7" role="button" tabindex="0">
+              <span class="num">DAY 03</span>
+              <span class="scrip">행 8:14</span>
+              <span class="ttl">말씀을 받는다는 것.</span>
+            </div>
+            <div class="day-tile" data-goto="10" role="button" tabindex="0">
+              <span class="num">DAY 04</span>
+              <span class="scrip">행 8:20</span>
+              <span class="ttl">성령은 소유가 아닙니다.</span>
+            </div>
+            <div class="day-tile" data-goto="13" role="button" tabindex="0">
+              <span class="num">DAY 05</span>
+              <span class="scrip">롬 12:1</span>
+              <span class="ttl">함께 짊어지는 신앙.</span>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- DAY 1 -->
+      <section class="slide bg-canvas" data-bg="light">
+        <div class="slide-inner two-col">
+          <div>
+            <div class="label build">DAY 01 · 흩어진 자리에서</div>
+            <h2 class="display-xl build">흩어져도,<br/>복음은 멈추지 않습니다.</h2>
+            <p class="subhead build">박해로 흩어진 성도들은 실패가 아니었습니다. 가는 곳마다 말씀을 전하는 증인이 되었습니다.</p>
+            <div class="scripture build">
+              <p class="quote">"그 흩어진 사람들이 두루 다니며 복음의 말씀을 전할새"</p>
+              <p class="cite">사도행전 8:4</p>
+            </div>
+          </div>
+          <div class="day-illustration build"><svg><use href="#day1-svg"/></svg></div>
+        </div>
+      </section>
+
+      <section class="slide bg-canvas" data-bg="light">
+        <div class="slide-inner">
+          <div class="label build">DAY 01 · 묵상</div>
+          <h3 class="key-pull build">"흩어짐은 실패가 아니라,<br/>하나님의 확장 방식입니다."</h3>
+          <p class="body build" style="margin-top: 18px;">
+            스데반의 순교 이후 예루살렘 교회에 큰 박해가 임했습니다. 성도들은 뿔뿔이 흩어졌습니다. 모든 것이 끝난 것처럼 보였습니다. 그러나 흩어진 사람들은 가는 곳마다 복음을 전했습니다.
+          </p>
+          <p class="body build" style="margin-top: 14px;">
+            빌립이 사마리아에서 전한 복음은 귀신을 쫓아내고, 중풍병자를 일으켰습니다. <span class="strong">박해가 오히려 사역지의 이동이었고, 복음 확장의 도구였습니다.</span> 내가 지금 있는 자리, 나의 흩어짐도 하나님의 손 안에 있습니다.
+          </p>
+        </div>
+      </section>
+
+      <section class="slide bg-card" data-bg="light">
+        <div class="slide-inner">
+          <div class="label build">DAY 01 · 적용 + 기도</div>
+          <h3 class="display-md build">내 삶의 '흩어짐'을 하나님의 관점으로 다시 보기.</h3>
+          <div class="qline build">
+            <span class="qnum">01</span>
+            <span class="qtext">지금 내가 경험하는 어려움이나 예기치 않은 변화 속에서, 어떤 복음의 기회가 숨어 있을까요?</span>
+          </div>
+          <div class="qline build">
+            <span class="qnum">02</span>
+            <span class="qtext">내가 지금 서 있는 자리에서 복음을 전할 수 있는 한 가지 방법은 무엇입니까?</span>
+          </div>
+          <div class="prayer-divider build"></div>
+          <p class="prayer-text build">
+            주님,<br/>
+            내 흩어짐도, 내 어려움도<br/>
+            당신의 손 안에 있음을 믿습니다.<br/>
+            어디서든 복음의 증인이 되게 하소서.
+          </p>
+          <span class="amen build">— 아멘.</span>
+        </div>
+      </section>
+
+      <!-- DAY 2 -->
+      <section class="slide bg-canvas" data-bg="light">
+        <div class="slide-inner two-col">
+          <div>
+            <div class="label build">DAY 02 · 진짜 능력 앞에서</div>
+            <h2 class="display-xl build">복음이<br/>주술을 이깁니다.</h2>
+            <p class="subhead build">가짜를 이기는 유일한 길은 진짜를 보여주는 것입니다. 빌립은 복음으로 사마리아를 뒤집었습니다.</p>
+            <div class="scripture build">
+              <p class="quote">"빌립이 하나님 나라와 및 예수 그리스도의 이름에 관하여 전도함을 그들이 믿고 남녀가 다 세례를 받으니"</p>
+              <p class="cite">사도행전 8:12</p>
+            </div>
+          </div>
+          <div class="day-illustration build"><svg><use href="#day2-svg"/></svg></div>
+        </div>
+      </section>
+
+      <section class="slide bg-canvas" data-bg="light">
+        <div class="slide-inner">
+          <div class="label build">DAY 02 · 묵상</div>
+          <h3 class="key-pull build">"소유 없이도 행복할 수 있다는 것,<br/>복음만이 알려줄 수 있습니다."</h3>
+          <p class="body build" style="margin-top: 18px;">
+            사마리아에는 이미 시몬이라는 유명한 마술사가 있었습니다. 그는 오랜 세월 사람들을 놀라게 하며 종교적 권위를 누렸습니다. 그러나 빌립이 전하는 복음은 비교할 수 없는 무언가를 가져왔습니다.
+          </p>
+          <p class="body build" style="margin-top: 14px;">
+            소유하지 않고도 행복하다는 것, 경쟁에서 이기지 않아도 만족할 수 있다는 것, 차별받으면서도 충만히 기뻐할 수 있다는 것 — <span class="strong">처음 경험해보는 기쁨이었습니다.</span> 심지어 시몬조차 세례를 받고 빌립을 따랐습니다.
+          </p>
+        </div>
+      </section>
+
+      <section class="slide bg-card" data-bg="light">
+        <div class="slide-inner">
+          <div class="label build">DAY 02 · 적용 + 기도</div>
+          <h3 class="display-md build">내 삶에서 복음이 이기고 있는 자리 발견하기.</h3>
+          <div class="qline build">
+            <span class="qnum">01</span>
+            <span class="qtext">요즘 내 마음을 사로잡는 '세상의 주술' — 불안, 비교, 소유욕 — 은 무엇입니까?</span>
+          </div>
+          <div class="qline build">
+            <span class="qnum">02</span>
+            <span class="qtext">그 자리에서 복음이 주는 기쁨을 어떻게 경험할 수 있을까요? 구체적인 한 가지를 떠올려 보세요.</span>
+          </div>
+          <div class="prayer-divider build"></div>
+          <p class="prayer-text build">
+            주님,<br/>
+            세상이 주는 거짓 만족에서 돌아서게 하소서.<br/>
+            복음이 주는 진짜 기쁨으로<br/>
+            오늘 하루를 살게 하소서.
+          </p>
+          <span class="amen build">— 아멘.</span>
+        </div>
+      </section>
+
+      <!-- DAY 3 -->
+      <section class="slide bg-canvas" data-bg="light">
+        <div class="slide-inner two-col">
+          <div>
+            <div class="label build">DAY 03 · 말씀을 받는다는 것</div>
+            <h2 class="display-xl build">내 이야기를<br/>하나님의 이야기로.</h2>
+            <p class="subhead build">회심의 핵심은 하나님의 말씀을 내 현실로 받아들이는 것입니다. 사마리아도 그 말씀을 받았습니다.</p>
+            <div class="scripture build">
+              <p class="quote">"예루살렘에 있는 사도들이 사마리아도 하나님의 말씀을 받았다 함을 듣고"</p>
+              <p class="cite">사도행전 8:14</p>
+            </div>
+          </div>
+          <div class="day-illustration build"><svg><use href="#day3-svg"/></svg></div>
+        </div>
+      </section>
+
+      <section class="slide bg-canvas" data-bg="light">
+        <div class="slide-inner">
+          <div class="label build">DAY 03 · 묵상</div>
+          <h3 class="key-pull build">"나의 이야기를 내려놓고,<br/>하나님의 이야기를 내 삶으로 받는 것."</h3>
+          <p class="body build" style="margin-top: 18px;">
+            회심의 핵심은 무엇입니까? 뜨거운 눈물입니까, 특별한 체험입니까? 물론 그것들이 따라올 수 있습니다. 그러나 회심의 본질은 하나님의 말씀을 나의 현실로 받아들이는 것입니다.
+          </p>
+          <p class="body build" style="margin-top: 14px;">
+            내 멋대로 써 내려가던 인생의 이야기를 하나님의 이야기로 바꾸는 것입니다. <span class="strong">왕이 바뀌고, 세계관이 바뀌고, 나라가 바뀝니다.</span> 사마리아 사람들에게 일어난 그 일이 지금 우리에게도 일어나고 있습니다.
+          </p>
+        </div>
+      </section>
+
+      <section class="slide bg-card" data-bg="light">
+        <div class="slide-inner">
+          <div class="label build">DAY 03 · 적용 + 기도</div>
+          <h3 class="display-md build">오늘, 하나님의 말씀 한 구절을 내 현실로 받아들이기.</h3>
+          <div class="qline build">
+            <span class="qnum">01</span>
+            <span class="qtext">지금 하나님의 말씀 중에서 내 삶에 가장 저항이 느껴지는 부분은 어디입니까?</span>
+          </div>
+          <div class="qline build">
+            <span class="qnum">02</span>
+            <span class="qtext">그 말씀을 '내 현실로 받아들인다'는 것은 오늘 어떤 구체적인 변화를 의미합니까?</span>
+          </div>
+          <div class="prayer-divider build"></div>
+          <p class="prayer-text build">
+            주님,<br/>
+            내 이야기에 집착했던 저를 용서하소서.<br/>
+            오늘 당신의 말씀을<br/>
+            내 삶의 현실로 받게 하소서.
+          </p>
+          <span class="amen build">— 아멘.</span>
+        </div>
+      </section>
+
+      <!-- DAY 4 -->
+      <section class="slide bg-dark" data-bg="dark">
+        <div class="slide-inner two-col">
+          <div>
+            <div class="label build">DAY 04 · 시몬의 실수</div>
+            <h2 class="display-xl build">성령을 사랑하는가,<br/>아니면 사용하는가?</h2>
+            <p class="subhead build">시몬은 성령을 얻고 싶었습니다. 그러나 그가 원한 것은 기술이었지 항복이 아니었습니다.</p>
+            <div class="scripture build">
+              <p class="quote">"네가 하나님의 선물을 돈 주고 살 줄로 생각하였으니 네 은과 네가 함께 망할지어다"</p>
+              <p class="cite">사도행전 8:20</p>
+            </div>
+          </div>
+          <div class="day-illustration build"><svg><use href="#day4-svg"/></svg></div>
+        </div>
+      </section>
+
+      <section class="slide bg-canvas" data-bg="light">
+        <div class="slide-inner">
+          <div class="label build">DAY 04 · 묵상</div>
+          <h3 class="key-pull build">"성령은 소유의 대상이 아니라,<br/>순종의 대상입니다."</h3>
+          <p class="body build" style="margin-top: 18px;">
+            시몬은 처음부터 악의를 가진 사람이 아니었을 것입니다. 그는 빌립을 전심으로 따랐습니다. 그러나 그의 눈에 안수 사역은 마법 주문처럼 보였습니다. 돈으로 그 기술을 사면 더 큰 종교 사업을 할 수 있겠다고 생각했습니다.
+          </p>
+          <p class="body build" style="margin-top: 14px;">
+            베드로가 경고했습니다. 하나님의 선물은 돈으로 살 수 없다고. <span class="strong">시몬이 원한 것은 기술이었지 항복이 아니었습니다.</span> 우리는 어떻습니까? 성령을 사랑하는가, 아니면 성령을 사용하는가? 이 질문 앞에 정직하게 서야 합니다.
+          </p>
+        </div>
+      </section>
+
+      <section class="slide bg-card" data-bg="light">
+        <div class="slide-inner">
+          <div class="label build">DAY 04 · 적용 + 기도</div>
+          <h3 class="display-md build">내 신앙 안의 시몬을 정직하게 바라보기.</h3>
+          <div class="qline build">
+            <span class="qnum">01</span>
+            <span class="qtext">하나님의 능력을 기대할 때, 그분의 영광을 위해서입니까, 내가 원하는 것을 얻기 위해서입니까?</span>
+          </div>
+          <div class="qline build">
+            <span class="qnum">02</span>
+            <span class="qtext">내 신앙 생활에서 '기술'로 접근하는 부분이 있다면 무엇입니까? (열심, 헌금, 섬김 등)</span>
+          </div>
+          <div class="prayer-divider build"></div>
+          <p class="prayer-text build">
+            주님,<br/>
+            당신을 이용하려 했던 마음을 용서하소서.<br/>
+            성령님을 사랑하고 순종하는<br/>
+            참된 제자로 살아가게 하소서.
+          </p>
+          <span class="amen build">— 아멘.</span>
+        </div>
+      </section>
+
+      <!-- DAY 5 -->
+      <section class="slide bg-canvas" data-bg="light">
+        <div class="slide-inner two-col">
+          <div>
+            <div class="label build">DAY 05 · 만왕의 왕께</div>
+            <h2 class="display-xl build">함께 짊어지는<br/>신앙으로.</h2>
+            <p class="subhead build">주님의 십자가에 올라타는 것이 아니라, 함께 짊어지는 신앙 — 그것이 진정한 예배입니다.</p>
+            <div class="scripture build">
+              <p class="quote">"너희 몸을 하나님이 기뻐하시는 거룩한 산 제물로 드리라 이는 너희가 드릴 영적 예배니라"</p>
+              <p class="cite">로마서 12:1</p>
+            </div>
+          </div>
+          <div class="day-illustration build"><svg><use href="#day5-svg"/></svg></div>
+        </div>
+      </section>
+
+      <section class="slide bg-canvas" data-bg="light">
+        <div class="slide-inner">
+          <div class="label build">DAY 05 · 묵상</div>
+          <h3 class="key-pull build">"주님을 사랑하지 않고<br/>이용만 하는 신앙을 돌이킵니다."</h3>
+          <p class="body build" style="margin-top: 18px;">
+            만왕의 왕이라고 고백하면서 쓰다 남은 시간을 드리고, 먹다 남은 음식을 드리는 것은 모순입니다. 시몬처럼 주님의 십자가에 올라타서 내가 원하는 곳으로 가려는 신앙은 믿음이 아닙니다.
+          </p>
+          <p class="body build" style="margin-top: 14px;">
+            진정한 예배는 온전한 헌신을 요구합니다. <span class="strong">나도 모르는 내 어두움과 죄와 유혹을 정직하게 버릴 수 있는 은혜</span> — 바로 그 자리에서 예배가 시작됩니다.
+          </p>
+        </div>
+      </section>
+
+      <section class="slide bg-dark" data-bg="dark">
+        <div class="slide-inner">
+          <div class="label build">한 주의 결단</div>
+          <h3 class="display-md build">이번 주,<br/>주님을 사랑하는 자로 살기.</h3>
+          <div class="qline build">
+            <span class="qnum">01</span>
+            <span class="qtext">나는 지금 성령을 사랑하는 사람입니까, 아니면 성령의 능력을 이용하는 사람입니까?</span>
+          </div>
+          <div class="qline build">
+            <span class="qnum">02</span>
+            <span class="qtext">이번 한 주 묵상에서 가장 깊이 남은 한 문장을, 일상에서 어떻게 살아내겠습니까?</span>
+          </div>
+          <div class="prayer-divider build"></div>
+          <p class="prayer-text build">
+            주님,<br/>
+            나도 모르는 내 어두움과 유혹을 보게 하시고<br/>
+            정직하게 버릴 수 있는 은혜를 부어 주소서.<br/>
+            주님 뜻을 따르기 원합니다.
+          </p>
+          <span class="amen build">— 아멘.</span>
+        </div>
+      </section>
+
+    </div><!-- /reel -->
+  </div><!-- /deck -->
+</div><!-- /stage -->
+
+<script>
+  const deck = document.getElementById("deck");
+  const slides = Array.from(document.querySelectorAll(".slide"));
+  const total = slides.length;
+  const curEl = document.getElementById("curIdx");
+  const totEl = document.getElementById("totIdx");
+  totEl.textContent = total;
+  let cur = 0;
+
+  function applyMode() {
+    const isDark = (slides[cur].dataset.bg || "light") === "dark";
+    deck.classList.toggle("dark-mode", isDark);
+  }
+  function snapPositions(activeIdx) {
+    slides.forEach((s, i) => {
+      s.classList.remove("is-current", "is-prev", "is-next", "is-animating");
+      if (i === activeIdx) s.classList.add("is-current");
+      else if (i < activeIdx) s.classList.add("is-prev");
+      else s.classList.add("is-next");
+    });
+  }
+  function go(idx, push = true) {
+    idx = Math.max(0, Math.min(total - 1, idx));
+    if (idx === cur && slides[cur].classList.contains("is-current")) return;
+    const dir = idx >= cur ? "fwd" : "back";
+    const oldCur = cur;
+    slides.forEach((s, i) => {
+      if (i === oldCur || i === idx) return;
+      s.classList.remove("is-current", "is-prev", "is-next", "is-animating");
+      if (i < idx) s.classList.add("is-prev");
+      else s.classList.add("is-next");
+    });
+    const out = slides[oldCur], inc = slides[idx];
+    out.classList.add("is-animating"); inc.classList.add("is-animating");
+    requestAnimationFrame(() => {
+      out.classList.remove("is-current");
+      out.classList.add(dir === "fwd" ? "is-prev" : "is-next");
+      inc.classList.remove("is-prev", "is-next");
+      inc.classList.add("is-current");
+    });
+    cur = idx;
+    curEl.textContent = cur + 1;
+    applyMode();
+    if (push) history.replaceState(null, "", `#${cur + 1}`);
+  }
+
+  const initialHash = parseInt(location.hash.replace("#", ""), 10);
+  const startIdx = Number.isFinite(initialHash) && initialHash >= 1 ? Math.min(initialHash - 1, total - 1) : 0;
+  cur = startIdx;
+  snapPositions(startIdx);
+  curEl.textContent = cur + 1;
+  applyMode();
+
+  function next() { go(cur + 1); }
+  function prev() { go(cur - 1); }
+
+  document.addEventListener("keydown", (e) => {
+    switch (e.key) {
+      case "ArrowRight": case " ": case "PageDown": e.preventDefault(); next(); break;
+      case "ArrowLeft": case "PageUp": e.preventDefault(); prev(); break;
+      case "Home": e.preventDefault(); go(0); break;
+      case "End": e.preventDefault(); go(total - 1); break;
+      case "f": case "F":
+        if (!document.fullscreenElement) document.documentElement.requestFullscreen?.();
+        else document.exitFullscreen?.();
+        break;
+    }
+  });
+
+  document.getElementById("navLeft").addEventListener("click", prev);
+  document.getElementById("navRight").addEventListener("click", next);
+
+  document.querySelectorAll(".day-tile[data-goto]").forEach(tile => {
+    const handler = (e) => {
+      e.preventDefault();
+      go(parseInt(tile.dataset.goto, 10));
+    };
+    tile.addEventListener("click", handler);
+    tile.addEventListener("keydown", (e) => {
+      if (e.key === "Enter" || e.key === " ") handler(e);
+    });
+  });
+
+  let tx = null;
+  deck.addEventListener("touchstart", (e) => { tx = e.touches[0].clientX; }, { passive: true });
+  deck.addEventListener("touchend", (e) => {
+    if (tx === null) return;
+    const dx = e.changedTouches[0].clientX - tx;
+    if (Math.abs(dx) > 60) (dx < 0 ? next : prev)();
+    tx = null;
+  });
+</script>
+</body>
+</html>
