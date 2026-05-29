@@ -1,0 +1,695 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>5일 묵상 — 새로고침!! (사도행전 9:10-19)</title>
+<link href="https://fonts.googleapis.com/css2?family=Nanum+Myeongjo:wght@400;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/suit@3.0.1/dist/suit.css">
+<style>
+  :root {
+    --primary: #cc785c;
+    --canvas: #faf9f5;
+    --card: #efe9de;
+    --dark: #181715;
+    --ink: #141413;
+    --body: #3d3d3a;
+    --muted: #6c6a64;
+    --on-dark: #faf9f5;
+    --on-dark-soft: #a09d96;
+    --hairline: #e6dfd8;
+    --font-display: "Nanum Myeongjo", "NanumMyeongjo", "Noto Serif KR", Georgia, serif;
+    --font-sans: "SUIT", "SUIT Variable", -apple-system, BlinkMacSystemFont, "Apple SD Gothic Neo", system-ui, sans-serif;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body { height: 100%; overflow: hidden; font-family: var(--font-sans); background: #1a1a1a; -webkit-font-smoothing: antialiased; }
+  .label, .display-xl, .display-lg, .display-md, .subhead, .body,
+  .key-pull, .scripture .quote, .scripture .cite, .qtext, .qnum, .prayer-text,
+  .day-tile .ttl, .day-tile .num, .day-tile .scrip, .corner, .amen {
+    word-break: keep-all; overflow-wrap: break-word;
+  }
+
+  .stage {
+    position: fixed; inset: 0;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .deck {
+    position: relative;
+    aspect-ratio: 16 / 9;
+    width: 100vw; height: auto;
+    max-height: 100vh;
+    background: var(--canvas);
+    overflow: hidden;
+  }
+  @supports not (aspect-ratio: 16 / 9) {
+    .deck { width: 100vw; height: 56.25vw; }
+  }
+
+  .reel { position: relative; width: 100%; height: 100%; perspective: 1800px; transform-style: preserve-3d; }
+  .slide {
+    position: absolute; inset: 0;
+    display: flex; align-items: center;
+    padding: clamp(28px, 4.5vh, 60px) clamp(36px, 5.5vw, 90px);
+    opacity: 0; pointer-events: none;
+    transform: translateX(100%);
+    overflow: auto;
+  }
+  .slide.is-animating { transition: transform 0.6s cubic-bezier(.65,0,.2,1), opacity 0.5s ease; }
+  .slide.is-current { opacity: 1; pointer-events: auto; transform: translateX(0); z-index: 2; }
+  .slide.is-prev { transform: translateX(-100%); opacity: 1; }
+  .slide.is-next { transform: translateX(100%); opacity: 1; }
+
+  .bg-canvas { background: var(--canvas); color: var(--ink); }
+  .bg-card { background: var(--card); color: var(--ink); }
+  .bg-dark { background: var(--dark); color: var(--on-dark); }
+
+  .slide-inner { width: 100%; max-width: 1200px; margin: 0 auto; }
+  .two-col { display: grid; grid-template-columns: 1.05fr 1fr; gap: clamp(28px, 4vw, 60px); align-items: center; }
+
+  .label {
+    font-family: var(--font-sans); font-weight: 700;
+    font-size: clamp(16px, 1.4vw, 21px); letter-spacing: 0.08em;
+    text-transform: uppercase; color: var(--muted);
+    margin-bottom: 26px;
+  }
+  .bg-dark .label { color: var(--on-dark-soft); }
+
+  .display-xl {
+    font-family: var(--font-display); font-weight: 800;
+    font-size: clamp(44px, 5.8vw, 82px);
+    line-height: 1.10; letter-spacing: -0.025em;
+    margin-bottom: 20px;
+  }
+  .display-lg {
+    font-family: var(--font-display); font-weight: 800;
+    font-size: clamp(38px, 4.6vw, 64px);
+    line-height: 1.12; letter-spacing: -0.022em;
+    margin-bottom: 18px;
+  }
+  .display-md {
+    font-family: var(--font-display); font-weight: 800;
+    font-size: clamp(32px, 3.6vw, 50px);
+    line-height: 1.22; letter-spacing: -0.018em;
+    margin-bottom: 16px;
+  }
+  .subhead {
+    font-family: var(--font-sans); font-weight: 500;
+    font-size: clamp(20px, 2vw, 27px);
+    line-height: 1.5; letter-spacing: -0.01em;
+    color: var(--body); margin-bottom: 24px;
+  }
+  .bg-dark .subhead { color: var(--on-dark-soft); }
+
+  .body {
+    font-family: var(--font-sans); font-weight: 400;
+    font-size: clamp(18px, 1.7vw, 23px);
+    line-height: 1.7; letter-spacing: -0.005em;
+    color: var(--body);
+  }
+  .bg-dark .body { color: var(--on-dark-soft); }
+  .strong { font-weight: 600; color: var(--ink); }
+  .bg-dark .strong { color: var(--on-dark); }
+
+  .scripture {
+    margin-top: 24px;
+    padding-left: 20px;
+    border-left: 4px solid var(--primary);
+  }
+  .scripture .quote {
+    font-family: var(--font-display); font-weight: 700;
+    font-size: clamp(22px, 2.3vw, 30px);
+    line-height: 1.42; letter-spacing: -0.012em;
+  }
+  .scripture .cite {
+    margin-top: 12px;
+    font-family: var(--font-sans); font-weight: 700;
+    font-size: clamp(15px, 1.3vw, 19px); letter-spacing: 0.07em;
+    text-transform: uppercase; color: var(--muted);
+  }
+  .bg-dark .scripture .cite { color: var(--on-dark-soft); }
+
+  .key-pull {
+    font-family: var(--font-display); font-weight: 800;
+    font-size: clamp(34px, 4vw, 56px);
+    line-height: 1.22; letter-spacing: -0.022em;
+    margin-bottom: 24px;
+  }
+
+  .qline { display: grid; grid-template-columns: 64px 1fr; gap: 18px; padding: 16px 0; align-items: baseline; }
+  .qline + .qline { border-top: 1px solid var(--hairline); }
+  .bg-dark .qline + .qline { border-top: 1px solid rgba(255,255,255,0.08); }
+  .qnum {
+    font-family: var(--font-sans); font-weight: 700;
+    font-size: clamp(16px, 1.4vw, 20px); letter-spacing: 0.08em;
+    color: var(--primary);
+  }
+  .qtext {
+    font-family: var(--font-sans); font-weight: 500;
+    font-size: clamp(19px, 1.8vw, 24px); line-height: 1.58; letter-spacing: -0.005em;
+  }
+
+  .prayer-text {
+    font-family: var(--font-display); font-weight: 700;
+    font-size: clamp(26px, 2.7vw, 36px);
+    line-height: 1.48; letter-spacing: -0.018em;
+  }
+  .prayer-divider { width: 72px; height: 3px; background: var(--primary); margin: 34px 0 26px; }
+  .amen {
+    display: inline-block; margin-top: 20px;
+    font-family: var(--font-sans); font-weight: 700;
+    font-size: clamp(16px, 1.3vw, 19px); letter-spacing: 0.1em;
+    color: var(--muted);
+  }
+  .bg-dark .amen { color: var(--on-dark-soft); }
+
+  .day-illustration { width: 100%; max-width: 480px; aspect-ratio: 1 / 1; }
+  .day-illustration svg { width: 100%; height: 100%; display: block; }
+
+  .day-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 14px; margin-top: 32px; max-width: 1100px; }
+  .day-tile {
+    padding: 22px 18px; border-radius: 14px;
+    border: 1px solid var(--hairline); background: var(--canvas);
+    display: flex; flex-direction: column; gap: 8px; min-height: 200px;
+    transition: border-color 0.2s ease, transform 0.2s ease;
+  }
+  .day-tile { cursor: pointer; }
+  .day-tile:hover { border-color: var(--primary); transform: translateY(-2px); }
+  .day-tile:focus-visible { outline: 2px solid var(--primary); outline-offset: 3px; }
+  .day-tile:active { transform: translateY(0); }
+  .day-tile .num { font-family: var(--font-sans); font-weight: 700; font-size: 14px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--primary); }
+  .day-tile .scrip { font-family: var(--font-sans); font-weight: 700; font-size: 13px; letter-spacing: 0.06em; text-transform: uppercase; color: var(--muted); }
+  .day-tile .ttl { font-family: var(--font-display); font-weight: 800; font-size: 24px; line-height: 1.2; letter-spacing: -0.018em; margin-top: auto; }
+
+  .corner {
+    position: absolute; bottom: 20px; z-index: 5;
+    font-family: var(--font-sans); font-weight: 700;
+    font-size: 14px; letter-spacing: 0.08em; text-transform: uppercase;
+    color: var(--muted); pointer-events: none;
+  }
+  .bg-dark .corner { color: var(--on-dark-soft); }
+  .corner.left { left: clamp(28px, 5vw, 60px); }
+  .corner.right { right: clamp(28px, 5vw, 60px); font-variant-numeric: tabular-nums; }
+
+  .nav-zone { position: absolute; top: 0; bottom: 0; width: 18%; z-index: 30; cursor: pointer; }
+  .nav-zone.left { left: 0; }
+  .nav-zone.right { right: 0; }
+  .nav-zone .arrow {
+    position: absolute; top: 50%; transform: translateY(-50%);
+    width: 44px; height: 44px; border-radius: 8px;
+    background: rgba(20,20,19,0.06); color: var(--ink);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 18px; opacity: 0; transition: opacity 0.25s;
+  }
+  .nav-zone.left .arrow { left: 16px; }
+  .nav-zone.right .arrow { right: 16px; }
+  .nav-zone:hover .arrow { opacity: 1; }
+  .deck.dark-mode .nav-zone .arrow { background: rgba(255,255,255,0.12); color: var(--on-dark); }
+
+  .build { opacity: 0; transform: translateY(12px); transition: opacity 0.5s ease, transform 0.5s cubic-bezier(.2,.7,.3,1); }
+  .slide.is-current .build { opacity: 1; transform: translateY(0); }
+  .slide.is-current .build:nth-of-type(1) { transition-delay: 0.08s; }
+  .slide.is-current .build:nth-of-type(2) { transition-delay: 0.18s; }
+  .slide.is-current .build:nth-of-type(3) { transition-delay: 0.28s; }
+  .slide.is-current .build:nth-of-type(4) { transition-delay: 0.38s; }
+
+  @media (max-width: 833px) {
+    .stage { background: var(--canvas); }
+    .deck {
+      aspect-ratio: auto;
+      width: 100vw;
+      height: 100dvh;
+      max-height: 100dvh;
+    }
+    @supports not (height: 100dvh) {
+      .deck { height: 100vh; max-height: 100vh; }
+    }
+    .slide {
+      padding: 56px 20px calc(72px + env(safe-area-inset-bottom));
+      align-items: flex-start;
+    }
+    .two-col { grid-template-columns: 1fr; gap: 22px; align-items: start; }
+    .day-illustration { max-width: 180px; margin: 8px auto 0; order: 2; }
+    .day-grid {
+      grid-template-columns: 1fr;
+      gap: 10px; margin-top: 22px; max-width: 100%;
+    }
+    .day-tile {
+      min-height: auto;
+      flex-direction: row; align-items: center; gap: 12px;
+      padding: 16px 18px;
+    }
+    .day-tile .ttl { margin-top: 0; font-size: 18px; flex: 1; }
+    .day-tile .num, .day-tile .scrip { font-size: 11px; white-space: nowrap; }
+
+    .corner {
+      font-size: 11px;
+      bottom: calc(20px + env(safe-area-inset-bottom));
+      letter-spacing: 0.06em;
+    }
+    .corner.left { left: 16px; max-width: 60%; }
+    .corner.right { right: 16px; }
+
+    .nav-zone { width: 14%; }
+    .nav-zone .arrow { width: 36px; height: 36px; font-size: 16px; }
+
+    .display-xl { font-size: clamp(38px, 9vw, 56px); }
+    .display-lg { font-size: clamp(34px, 8vw, 48px); }
+    .display-md { font-size: clamp(28px, 7vw, 40px); }
+    .key-pull { font-size: clamp(28px, 7vw, 38px); }
+    .subhead { font-size: clamp(18px, 4.6vw, 22px); }
+    .body { font-size: clamp(16px, 4.2vw, 19px); }
+    .scripture .quote { font-size: clamp(19px, 4.8vw, 24px); }
+    .scripture .cite { font-size: clamp(13px, 3.4vw, 16px); }
+    .qtext { font-size: clamp(17px, 4.4vw, 20px); }
+    .qnum { font-size: clamp(14px, 3.6vw, 17px); }
+    .prayer-text { font-size: clamp(22px, 5.8vw, 28px); }
+    .label { font-size: clamp(13px, 3.4vw, 17px); }
+  }
+  @media (max-width: 833px) and (orientation: landscape) {
+    .slide { padding: 24px 32px 40px; }
+    .two-col { grid-template-columns: 1.1fr 1fr; gap: 18px; }
+    .day-illustration { max-width: 220px; order: 0; }
+  }
+</style>
+</head>
+<body>
+
+<svg width="0" height="0" style="position: absolute;">
+  <defs>
+    <!-- Day 1: 수평 길 위에 수직 빛이 내리꽂히며 멈춰 세우심 -->
+    <symbol id="day1-svg" viewBox="0 0 1024 1024">
+      <line x1="100" y1="600" x2="580" y2="600" stroke="#cc785c" stroke-width="5" stroke-linecap="round"/>
+      <line x1="580" y1="200" x2="580" y2="600" stroke="#cc785c" stroke-width="5" stroke-linecap="round"/>
+      <line x1="540" y1="240" x2="580" y2="200" stroke="#cc785c" stroke-width="4" stroke-linecap="round" opacity="0.7"/>
+      <line x1="620" y1="240" x2="580" y2="200" stroke="#cc785c" stroke-width="4" stroke-linecap="round" opacity="0.7"/>
+      <line x1="480" y1="290" x2="580" y2="240" stroke="#cc785c" stroke-width="3" stroke-linecap="round" opacity="0.45"/>
+      <line x1="680" y1="290" x2="580" y2="240" stroke="#cc785c" stroke-width="3" stroke-linecap="round" opacity="0.45"/>
+      <line x1="420" y1="360" x2="580" y2="290" stroke="#cc785c" stroke-width="2" stroke-linecap="round" opacity="0.3"/>
+      <line x1="740" y1="360" x2="580" y2="290" stroke="#cc785c" stroke-width="2" stroke-linecap="round" opacity="0.3"/>
+      <circle cx="580" cy="600" r="22" fill="#cc785c"/>
+      <path d="M 580 600 Q 660 560 700 470" stroke="#cc785c" stroke-width="4" fill="none" stroke-linecap="round" opacity="0.5" stroke-dasharray="8 12"/>
+    </symbol>
+    <!-- Day 2: 잘못된 방향의 화살표와 X 표시 -->
+    <symbol id="day2-svg" viewBox="0 0 1024 1024">
+      <line x1="180" y1="512" x2="660" y2="512" stroke="#cc785c" stroke-width="5" stroke-linecap="round"/>
+      <polyline points="620,472 660,512 620,552" stroke="#cc785c" stroke-width="5" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+      <line x1="730" y1="420" x2="860" y2="550" stroke="#cc785c" stroke-width="5" stroke-linecap="round" opacity="0.75"/>
+      <line x1="860" y1="420" x2="730" y2="550" stroke="#cc785c" stroke-width="5" stroke-linecap="round" opacity="0.75"/>
+      <path d="M 380 512 Q 380 300 512 220" stroke="#cc785c" stroke-width="3" fill="none" stroke-linecap="round" opacity="0.45" stroke-dasharray="8 10"/>
+      <polyline points="474,224 512,186 550,224" stroke="#cc785c" stroke-width="3" fill="none" stroke-linecap="round" stroke-linejoin="round" opacity="0.45"/>
+    </symbol>
+    <!-- Day 3: 눈 + 위를 향한 빛 (아나블레포) -->
+    <symbol id="day3-svg" viewBox="0 0 1024 1024">
+      <path d="M 190 512 Q 512 310 834 512 Q 512 714 190 512 Z" stroke="#cc785c" stroke-width="5" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+      <circle cx="512" cy="512" r="82" stroke="#cc785c" stroke-width="5" fill="none"/>
+      <circle cx="512" cy="512" r="26" fill="#cc785c"/>
+      <line x1="512" y1="310" x2="512" y2="140" stroke="#cc785c" stroke-width="4" stroke-linecap="round" opacity="0.75"/>
+      <line x1="476" y1="178" x2="512" y2="140" stroke="#cc785c" stroke-width="4" stroke-linecap="round" opacity="0.75"/>
+      <line x1="548" y1="178" x2="512" y2="140" stroke="#cc785c" stroke-width="4" stroke-linecap="round" opacity="0.75"/>
+      <path d="M 420 430 Q 440 400 460 430" stroke="#cc785c" stroke-width="3" fill="none" stroke-linecap="round" opacity="0.35"/>
+      <path d="M 462 430 Q 482 400 502 430" stroke="#cc785c" stroke-width="3" fill="none" stroke-linecap="round" opacity="0.35"/>
+      <path d="M 504 430 Q 524 400 544 430" stroke="#cc785c" stroke-width="3" fill="none" stroke-linecap="round" opacity="0.35"/>
+    </symbol>
+    <!-- Day 4: 위에서 내려오는 빛 + 받아 올리는 두 손 (람바노 / 에니스퀴오) -->
+    <symbol id="day4-svg" viewBox="0 0 1024 1024">
+      <line x1="512" y1="100" x2="512" y2="410" stroke="#cc785c" stroke-width="5" stroke-linecap="round"/>
+      <line x1="512" y1="190" x2="395" y2="140" stroke="#cc785c" stroke-width="3" stroke-linecap="round" opacity="0.5"/>
+      <line x1="512" y1="190" x2="629" y2="140" stroke="#cc785c" stroke-width="3" stroke-linecap="round" opacity="0.5"/>
+      <line x1="512" y1="260" x2="370" y2="225" stroke="#cc785c" stroke-width="2" stroke-linecap="round" opacity="0.35"/>
+      <line x1="512" y1="260" x2="654" y2="225" stroke="#cc785c" stroke-width="2" stroke-linecap="round" opacity="0.35"/>
+      <path d="M 345 560 Q 345 410 512 410 Q 679 410 679 560" stroke="#cc785c" stroke-width="5" fill="none" stroke-linecap="round"/>
+      <line x1="345" y1="560" x2="345" y2="700" stroke="#cc785c" stroke-width="5" stroke-linecap="round"/>
+      <line x1="679" y1="560" x2="679" y2="700" stroke="#cc785c" stroke-width="5" stroke-linecap="round"/>
+      <line x1="270" y1="700" x2="754" y2="700" stroke="#cc785c" stroke-width="5" stroke-linecap="round"/>
+    </symbol>
+    <!-- Day 5: 십자가 + 물결 (세례) -->
+    <symbol id="day5-svg" viewBox="0 0 1024 1024">
+      <line x1="512" y1="150" x2="512" y2="620" stroke="#cc785c" stroke-width="5" stroke-linecap="round"/>
+      <line x1="290" y1="330" x2="734" y2="330" stroke="#cc785c" stroke-width="5" stroke-linecap="round"/>
+      <path d="M 160 730 Q 290 660 420 730 Q 550 800 680 730 Q 810 660 864 700" stroke="#cc785c" stroke-width="5" fill="none" stroke-linecap="round"/>
+      <path d="M 160 820 Q 290 750 420 820 Q 550 890 680 820 Q 810 750 864 790" stroke="#cc785c" stroke-width="3" fill="none" stroke-linecap="round" opacity="0.45"/>
+    </symbol>
+  </defs>
+</svg>
+
+<div class="stage">
+  <div class="deck" id="deck">
+    <div class="corner left">새로고침!! · 5일 묵상</div>
+    <div class="corner right"><span id="curIdx">1</span> / <span id="totIdx">16</span></div>
+    <div class="nav-zone left" id="navLeft"><div class="arrow">←</div></div>
+    <div class="nav-zone right" id="navRight"><div class="arrow">→</div></div>
+
+    <div class="reel" id="reel">
+
+      <!-- 1. Series intro -->
+      <section class="slide bg-canvas" data-bg="light">
+        <div class="slide-inner">
+          <div class="label build">사도행전 9:10–19 · 사울의 회심</div>
+          <h1 class="display-lg build">새로고침!!</h1>
+          <p class="body build" style="margin-top: 8px;">
+            매일 한 편씩 — 본문 한 구절, 핵심 한 문장, 짧은 묵상글과 기도. 한 주를 함께 살아갑니다.
+          </p>
+          <div class="day-grid build">
+            <div class="day-tile" data-goto="1" role="button" tabindex="0"><span class="num">DAY 01</span><span class="scrip">행 9:4</span><span class="ttl">멈춰 세우시는 은혜.</span></div>
+            <div class="day-tile" data-goto="4" role="button" tabindex="0"><span class="num">DAY 02</span><span class="scrip">행 9:5</span><span class="ttl">잘못된 열심의 고백.</span></div>
+            <div class="day-tile" data-goto="7" role="button" tabindex="0"><span class="num">DAY 03</span><span class="scrip">행 9:18</span><span class="ttl">비늘이 벗겨질 때.</span></div>
+            <div class="day-tile" data-goto="10" role="button" tabindex="0"><span class="num">DAY 04</span><span class="scrip">행 9:19</span><span class="ttl">참생명을 위해 먹기.</span></div>
+            <div class="day-tile" data-goto="13" role="button" tabindex="0"><span class="num">DAY 05</span><span class="scrip">행 9:18</span><span class="ttl">진실한 세례교인으로.</span></div>
+          </div>
+        </div>
+      </section>
+
+      <!-- DAY 1 -->
+      <section class="slide bg-canvas" data-bg="light">
+        <div class="slide-inner two-col">
+          <div>
+            <div class="label build">DAY 01 · 멈춰 세우시는 은혜</div>
+            <h2 class="display-xl build">잘못된 길에서<br/>멈춰 세워지는 것,<br/>그것이 은혜입니다.</h2>
+            <p class="subhead build">길을 잃었을 때 더 빨리 달리는 것이 인간입니다. 그 질주를 멈춰 세우는 손이 가장 큰 축복입니다.</p>
+            <div class="scripture build">
+              <p class="quote">"사울아 사울아 네가 어찌하여 나를 박해하느냐"</p>
+              <p class="cite">사도행전 9:4</p>
+            </div>
+          </div>
+          <div class="day-illustration build"><svg><use href="#day1-svg"/></svg></div>
+        </div>
+      </section>
+      <section class="slide bg-canvas" data-bg="light">
+        <div class="slide-inner">
+          <div class="label build">DAY 01 · 묵상</div>
+          <h3 class="key-pull build">잘못된 열심을<br/>멈춰 세우는 것이<br/>은혜입니다.</h3>
+          <p class="body build" style="margin-top: 18px;">
+            심리학자 롤로 메이는 말했습니다. "인간은 길을 잃었을 때 더 빨리 뛰어가는 유일한 동물이다." 이제까지의 선택이 헛되었음을 인정하기 싫어서, 방향이 틀렸음을 알면서도 더 속도를 냅니다.
+          </p>
+          <p class="body build" style="margin-top: 14px;">
+            살면서 받을 수 있는 가장 큰 축복은 잘못된 길을 달리는 나를 누군가 붙잡아 멈춰 세워주는 것입니다. <span class="strong">주님은 오늘도 그 손을 내미십니다.</span>
+          </p>
+        </div>
+      </section>
+      <section class="slide bg-card" data-bg="light">
+        <div class="slide-inner">
+          <div class="label build">DAY 01 · 적용 + 기도</div>
+          <h3 class="display-md build">오늘 달리고 있는 방향을 한 번 멈추고 돌아보기.</h3>
+          <div class="qline build">
+            <span class="qnum">01</span>
+            <span class="qtext">지금 내가 열심히 하고 있는 일이 정말 주님이 원하시는 방향인지 돌아본 적이 있습니까?</span>
+          </div>
+          <div class="qline build">
+            <span class="qnum">02</span>
+            <span class="qtext">멈추기 싫어서 더 빨리 달렸던 때가 있습니까? 그때 주님은 어디 계셨을까요?</span>
+          </div>
+          <div class="prayer-divider build"></div>
+          <p class="prayer-text build">
+            주님,<br/>
+            달리는 것에 익숙해져서 멈추는 법을 잊어가고 있습니다.<br/>
+            오늘 잠시 멈추고 당신의 음성을 듣게 하소서.
+          </p>
+          <span class="amen build">— 아멘.</span>
+        </div>
+      </section>
+
+      <!-- DAY 2 -->
+      <section class="slide bg-canvas" data-bg="light">
+        <div class="slide-inner two-col">
+          <div>
+            <div class="label build">DAY 02 · 잘못된 열심의 고백</div>
+            <h2 class="display-xl build">열심히 달렸던 그 길이<br/>오히려 주님을<br/>아프게 했다면.</h2>
+            <p class="subhead build">사울은 하나님을 위한다고 확신하며 달렸습니다. 그러나 그 열심은 하나님을 박해하는 일이었습니다.</p>
+            <div class="scripture build">
+              <p class="quote">"나는 네가 박해하는 예수라"</p>
+              <p class="cite">사도행전 9:5</p>
+            </div>
+          </div>
+          <div class="day-illustration build"><svg><use href="#day2-svg"/></svg></div>
+        </div>
+      </section>
+      <section class="slide bg-canvas" data-bg="light">
+        <div class="slide-inner">
+          <div class="label build">DAY 02 · 묵상</div>
+          <h3 class="key-pull build">나의 열심이<br/>주님을<br/>아프게 할 수도 있습니다.</h3>
+          <p class="body build" style="margin-top: 18px;">
+            사울은 다메섹까지 216킬로미터를 걸어가며 예수 믿는 이들을 잡아 죽이는 것이 하나님의 뜻이라 확신했습니다. 하나님을 위한 열심이라 믿었던 일이 정작 하나님을 핍박하는 일이었습니다.
+          </p>
+          <p class="body build" style="margin-top: 14px;">
+            내 열정과 헌신이 실은 내 야망을 가장하고 있지는 않은지, <span class="strong">그래서 주님은 내 열심 때문에 오히려 박해를 당하고 계시지는 않은지</span> 돌아보아야 합니다.
+          </p>
+        </div>
+      </section>
+      <section class="slide bg-card" data-bg="light">
+        <div class="slide-inner">
+          <div class="label build">DAY 02 · 적용 + 기도</div>
+          <h3 class="display-md build">내 열심의 동기를 주님 앞에 정직하게 내놓기.</h3>
+          <div class="qline build">
+            <span class="qnum">01</span>
+            <span class="qtext">지금 열심히 하고 있는 일의 동기가 주님을 위한 것인지, 나 자신을 위한 것인지 물어본다면 어떻게 답하겠습니까?</span>
+          </div>
+          <div class="qline build">
+            <span class="qnum">02</span>
+            <span class="qtext">소명을 가장한 그릇된 헌신이나 야망이 있다면, 그것을 주님 앞에 내려놓기 위해 무엇이 필요합니까?</span>
+          </div>
+          <div class="prayer-divider build"></div>
+          <p class="prayer-text build">
+            주님,<br/>
+            나의 열심이 당신을 위한 것인지<br/>아니면 나를 위한 것인지, 정직하게 돌아보게 하소서.
+          </p>
+          <span class="amen build">— 아멘.</span>
+        </div>
+      </section>
+
+      <!-- DAY 3 -->
+      <section class="slide bg-dark" data-bg="dark">
+        <div class="slide-inner two-col">
+          <div>
+            <div class="label build">DAY 03 · 비늘이 벗겨질 때</div>
+            <h2 class="display-xl build">눈이 멀어야<br/>비로소<br/>보이는 세상.</h2>
+            <p class="subhead build">사흘의 어두움을 지나고서야, 사울의 눈에서 비늘이 벗겨졌습니다. 위를 볼 수 있는 새 눈이 열렸습니다.</p>
+            <div class="scripture build">
+              <p class="quote">"즉시 사울의 눈에서 비늘 같은 것이 벗어져 다시 보게 된지라"</p>
+              <p class="cite">사도행전 9:18</p>
+            </div>
+          </div>
+          <div class="day-illustration build"><svg><use href="#day3-svg"/></svg></div>
+        </div>
+      </section>
+      <section class="slide bg-canvas" data-bg="light">
+        <div class="slide-inner">
+          <div class="label build">DAY 03 · 묵상</div>
+          <h3 class="key-pull build">다시 보는 것은<br/>위를 보는 것입니다.</h3>
+          <p class="body build" style="margin-top: 18px;">
+            헬라어 '아나블레포'(ἀναβλέπω)는 '다시 보다'이면서 동시에 '위를 보다'라는 뜻입니다. 사울의 시력 회복은 단순한 육체적 회복이 아니었습니다. 부활하신 예수 그리스도를 우러러보는 영적 시력의 회복이었습니다.
+          </p>
+          <p class="body build" style="margin-top: 14px;">
+            몹쓸 병을 앓고, 사랑하는 사람을 잃고, 삶의 막막함을 마주하고서야 위를 바라보게 되는 경우가 있습니다. <span class="strong">어두움의 시간이 오히려 새 눈을 선물하기도 합니다.</span>
+          </p>
+        </div>
+      </section>
+      <section class="slide bg-card" data-bg="light">
+        <div class="slide-inner">
+          <div class="label build">DAY 03 · 적용 + 기도</div>
+          <h3 class="display-md build">지금 내 눈을 덮고 있는 비늘은 무엇인지 돌아보기.</h3>
+          <div class="qline build">
+            <span class="qnum">01</span>
+            <span class="qtext">보면서도 보지 못했던 것, 알면서도 인정하지 못했던 것이 있습니까? 그 비늘의 이름은 무엇입니까?</span>
+          </div>
+          <div class="qline build">
+            <span class="qnum">02</span>
+            <span class="qtext">어둡고 힘들었던 시간이 오히려 주님을 더 선명하게 보게 해준 경험이 있습니까?</span>
+          </div>
+          <div class="prayer-divider build"></div>
+          <p class="prayer-text build">
+            주님,<br/>
+            내 눈을 덮고 있는 비늘을 벗겨 주소서.<br/>
+            보면서도 보지 못했던 부활하신 당신을 다시 보게 하소서.
+          </p>
+          <span class="amen build">— 아멘.</span>
+        </div>
+      </section>
+
+      <!-- DAY 4 -->
+      <section class="slide bg-canvas" data-bg="light">
+        <div class="slide-inner two-col">
+          <div>
+            <div class="label build">DAY 04 · 참생명을 위해 먹기</div>
+            <h2 class="display-xl build">이제는 죽기 위해<br/>먹는 삶이<br/>아닙니다.</h2>
+            <p class="subhead build">사울이 음식을 먹고 강건해진 것은, 이제 참생명을 위해 먹고 하늘의 힘으로 사는 사람이 되었다는 선언입니다.</p>
+            <div class="scripture build">
+              <p class="quote">"음식을 먹으매 강건하여지니라"</p>
+              <p class="cite">사도행전 9:19</p>
+            </div>
+          </div>
+          <div class="day-illustration build"><svg><use href="#day4-svg"/></svg></div>
+        </div>
+      </section>
+      <section class="slide bg-canvas" data-bg="light">
+        <div class="slide-inner">
+          <div class="label build">DAY 04 · 묵상</div>
+          <h3 class="key-pull build">먹고 자고 일하는<br/>모든 순간이<br/>하나님의 능력을 덧입는 삶.</h3>
+          <p class="body build" style="margin-top: 18px;">
+            '먹다'에 쓰인 헬라어 '람바노'(λαμβάνω)는 '참생명을 취하다'라는 뜻이고, '강건해지다'의 '에니스퀴오'(ἐνισχύω)는 겟세마네 동산에서 예수님을 도왔던 천사의 힘과 같은 단어입니다.
+          </p>
+          <p class="body build" style="margin-top: 14px;">
+            이제 사울은 죽지 못해 사는 삶이 아닌, 위로부터 주어지는 하나님의 힘을 힘입어 사는 사람이 되었습니다. <span class="strong">먹고 자고 일하는 일상 전체가 하나님의 능력을 덧입는 순간이 됩니다.</span>
+          </p>
+        </div>
+      </section>
+      <section class="slide bg-card" data-bg="light">
+        <div class="slide-inner">
+          <div class="label build">DAY 04 · 적용 + 기도</div>
+          <h3 class="display-md build">오늘 하루의 일상을 참생명의 눈으로 다시 보기.</h3>
+          <div class="qline build">
+            <span class="qnum">01</span>
+            <span class="qtext">지금 "죽지 못해" 하고 있는 일이 있다면 무엇입니까? 그 일에 하나님의 능력을 구한다면 어떻게 달라질까요?</span>
+          </div>
+          <div class="qline build">
+            <span class="qnum">02</span>
+            <span class="qtext">겟세마네에서 예수님을 도운 것과 같은 힘이 나에게도 약속되어 있다면, 오늘 어떤 기도를 드리겠습니까?</span>
+          </div>
+          <div class="prayer-divider build"></div>
+          <p class="prayer-text build">
+            주님,<br/>
+            죽지 못해 버티는 하루가 아닌<br/>참생명을 위해 먹고, 하늘의 힘을 덧입어 사는 하루 되게 하소서.
+          </p>
+          <span class="amen build">— 아멘.</span>
+        </div>
+      </section>
+
+      <!-- DAY 5 -->
+      <section class="slide bg-canvas" data-bg="light">
+        <div class="slide-inner two-col">
+          <div>
+            <div class="label build">DAY 05 · 진실한 세례교인으로</div>
+            <h2 class="display-xl build">내 삶에<br/>선명한 믿음의<br/>획을 긋기.</h2>
+            <p class="subhead build">오른손을 강 밖에 내밀고 세례 받은 병사들처럼 살지 않겠습니다. 예수 그리스도와 함께 죽고 함께 삽니다.</p>
+            <div class="scripture build">
+              <p class="quote">"일어나 세례를 받고"</p>
+              <p class="cite">사도행전 9:18</p>
+            </div>
+          </div>
+          <div class="day-illustration build"><svg><use href="#day5-svg"/></svg></div>
+        </div>
+      </section>
+      <section class="slide bg-canvas" data-bg="light">
+        <div class="slide-inner">
+          <div class="label build">DAY 05 · 묵상</div>
+          <h3 class="key-pull build">먹고 일하고<br/>자녀 키우는 모든 일상에<br/>세례를 베풀기.</h3>
+          <p class="body build" style="margin-top: 18px;">
+            콘스탄티누스 황제의 병사들은 오른손을 강 밖에 내밀고 세례를 받았습니다. 형식은 거쳤지만 내면적으로 죽지 않았습니다. 반면 우찌무라 간조는 빗속에서 스스로 세례를 받았고, 그의 삶에는 옛사람의 죽음과 새사람의 거듭남이 분명했습니다.
+          </p>
+          <p class="body build" style="margin-top: 14px;">
+            우리도 예수 그리스도의 이름으로 세례를 받은 사람들입니다. <span class="strong">죽지 못해 출근하고, 죽지 못해 아이들 보는 삶이 아닌, 먹고 마시고 일하는 모든 일상이 거룩한 하나님의 일이 되어야 합니다.</span>
+          </p>
+        </div>
+      </section>
+      <section class="slide bg-dark" data-bg="dark">
+        <div class="slide-inner">
+          <div class="label build">마지막 기도</div>
+          <h3 class="display-md build">살던대로 살지 않겠다는<br/>결단, 한 가지 선명하게 긋기.</h3>
+          <div class="qline build">
+            <span class="qnum">01</span>
+            <span class="qtext">지금 내 삶에서 "오른손을 강 밖에 내밀고" 세례 받는 영역이 있다면 어디입니까?</span>
+          </div>
+          <div class="qline build">
+            <span class="qnum">02</span>
+            <span class="qtext">이번 한 주, 먹고 자고 일하는 일상 중 단 한 가지에 세례를 베푼다면, 그것은 무엇이겠습니까?</span>
+          </div>
+          <div class="prayer-divider build"></div>
+          <p class="prayer-text build">
+            주님,<br/>
+            예수 그리스도와 함께 죽고 함께 살아<br/>오직 주님을 위해 사는 진실한 세례교인이 되게 하소서.
+          </p>
+          <span class="amen build">— 아멘.</span>
+        </div>
+      </section>
+
+    </div>
+  </div>
+</div>
+
+<script>
+  const deck = document.getElementById("deck");
+  const slides = Array.from(document.querySelectorAll(".slide"));
+  const total = slides.length;
+  const curEl = document.getElementById("curIdx");
+  const totEl = document.getElementById("totIdx");
+  totEl.textContent = total;
+  let cur = 0;
+  function applyMode() {
+    const isDark = (slides[cur].dataset.bg || "light") === "dark";
+    deck.classList.toggle("dark-mode", isDark);
+  }
+  function snapPositions(activeIdx) {
+    slides.forEach((s, i) => {
+      s.classList.remove("is-current", "is-prev", "is-next", "is-animating");
+      if (i === activeIdx) s.classList.add("is-current");
+      else if (i < activeIdx) s.classList.add("is-prev");
+      else s.classList.add("is-next");
+    });
+  }
+  function go(idx, push = true) {
+    idx = Math.max(0, Math.min(total - 1, idx));
+    if (idx === cur && slides[cur].classList.contains("is-current")) return;
+    const dir = idx >= cur ? "fwd" : "back";
+    const oldCur = cur;
+    slides.forEach((s, i) => {
+      if (i === oldCur || i === idx) return;
+      s.classList.remove("is-current", "is-prev", "is-next", "is-animating");
+      if (i < idx) s.classList.add("is-prev");
+      else s.classList.add("is-next");
+    });
+    const out = slides[oldCur], inc = slides[idx];
+    out.classList.add("is-animating"); inc.classList.add("is-animating");
+    requestAnimationFrame(() => {
+      out.classList.remove("is-current");
+      out.classList.add(dir === "fwd" ? "is-prev" : "is-next");
+      inc.classList.remove("is-prev", "is-next");
+      inc.classList.add("is-current");
+    });
+    cur = idx;
+    curEl.textContent = cur + 1;
+    applyMode();
+    if (push) history.replaceState(null, "", `#${cur + 1}`);
+  }
+  const initialHash = parseInt(location.hash.replace("#", ""), 10);
+  const startIdx = Number.isFinite(initialHash) && initialHash >= 1 ? Math.min(initialHash - 1, total - 1) : 0;
+  cur = startIdx;
+  snapPositions(startIdx);
+  curEl.textContent = cur + 1;
+  applyMode();
+  function next() { go(cur + 1); }
+  function prev() { go(cur - 1); }
+  document.addEventListener("keydown", (e) => {
+    switch (e.key) {
+      case "ArrowRight": case " ": case "PageDown": e.preventDefault(); next(); break;
+      case "ArrowLeft": case "PageUp": e.preventDefault(); prev(); break;
+      case "Home": e.preventDefault(); go(0); break;
+      case "End": e.preventDefault(); go(total - 1); break;
+      case "f": case "F":
+        if (!document.fullscreenElement) document.documentElement.requestFullscreen?.();
+        else document.exitFullscreen?.();
+        break;
+    }
+  });
+  document.getElementById("navLeft").addEventListener("click", prev);
+  document.getElementById("navRight").addEventListener("click", next);
+
+  document.querySelectorAll(".day-tile[data-goto]").forEach(tile => {
+    const handler = (e) => {
+      e.preventDefault();
+      go(parseInt(tile.dataset.goto, 10));
+    };
+    tile.addEventListener("click", handler);
+    tile.addEventListener("keydown", (e) => {
+      if (e.key === "Enter" || e.key === " ") handler(e);
+    });
+  });
+  let tx = null;
+  deck.addEventListener("touchstart", (e) => { tx = e.touches[0].clientX; }, { passive: true });
+  deck.addEventListener("touchend", (e) => {
+    if (tx === null) return;
+    const dx = e.changedTouches[0].clientX - tx;
+    if (Math.abs(dx) > 60) (dx < 0 ? next : prev)();
+    tx = null;
+  });
+</script>
+</body>
+</html>
