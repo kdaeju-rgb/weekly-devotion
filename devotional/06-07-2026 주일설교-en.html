@@ -1,0 +1,786 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Forgotten Time, Prepared Time — 5-Day Devotional (Acts 9)</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --primary: #cc785c;
+    --primary-soft: #e8b09a;
+    --canvas: #faf9f5;
+    --card: #efe9de;
+    --card-deep: #e3dccd;
+    --dark: #181715;
+    --dark-soft: #25231f;
+    --ink: #141413;
+    --body: #3d3d3a;
+    --muted: #6c6a64;
+    --on-dark: #faf9f5;
+    --on-dark-soft: #a09d96;
+    --hairline: #e6dfd8;
+    --font-display: "Playfair Display", Georgia, serif;
+    --font-sans: "Inter", -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body { height: 100%; overflow: hidden; font-family: var(--font-sans); background: #1a1a1a; -webkit-font-smoothing: antialiased; }
+
+  .stage { position: fixed; inset: 0; display: flex; align-items: center; justify-content: center; }
+  .deck {
+    position: relative; aspect-ratio: 16 / 9;
+    width: 100vw; height: auto; max-height: 100vh;
+    background: var(--canvas); overflow: hidden;
+  }
+  @supports not (aspect-ratio: 16 / 9) { .deck { width: 100vw; height: 56.25vw; } }
+
+  .reel { position: relative; width: 100%; height: 100%; perspective: 1800px; transform-style: preserve-3d; }
+  .slide {
+    position: absolute; inset: 0;
+    display: flex; align-items: center;
+    padding: clamp(28px, 4.5vh, 60px) clamp(36px, 5.5vw, 90px);
+    opacity: 0; pointer-events: none;
+    transform: translateX(100%);
+    overflow: auto;
+  }
+  .slide.is-animating { transition: transform 0.6s cubic-bezier(.65,0,.2,1), opacity 0.5s ease; }
+  .slide.is-current { opacity: 1; pointer-events: auto; transform: translateX(0); z-index: 2; }
+  .slide.is-prev { transform: translateX(-100%); opacity: 1; }
+  .slide.is-next { transform: translateX(100%); opacity: 1; }
+
+  .bg-canvas { background: var(--canvas); color: var(--ink); }
+  .bg-card { background: var(--card); color: var(--ink); }
+  .bg-card-deep { background: var(--card-deep); color: var(--ink); }
+  .bg-dark { background: var(--dark); color: var(--on-dark); }
+  .bg-dark-soft { background: var(--dark-soft); color: var(--on-dark); }
+
+  .slide-inner { width: 100%; max-width: 1200px; margin: 0 auto; }
+  .slide-inner.center { text-align: center; }
+  .two-col { display: grid; grid-template-columns: 1.05fr 1fr; gap: clamp(28px, 4vw, 60px); align-items: center; }
+  .two-col.flip { grid-template-columns: 1fr 1.05fr; }
+  .two-col.flip .day-illustration { grid-column: 1; grid-row: 1; }
+  .two-col.flip .copy { grid-column: 2; grid-row: 1; }
+
+  .label {
+    font-family: var(--font-sans); font-weight: 700;
+    font-size: clamp(13px, 1.2vw, 18px); letter-spacing: 0.1em;
+    text-transform: uppercase; color: var(--muted);
+    margin-bottom: 22px;
+  }
+  .bg-dark .label, .bg-dark-soft .label { color: var(--on-dark-soft); }
+
+  .display-2xl {
+    font-family: var(--font-display); font-weight: 800;
+    font-size: clamp(46px, 6vw, 88px);
+    line-height: 1.06; letter-spacing: -0.025em;
+    margin-bottom: 24px;
+  }
+  .display-xl {
+    font-family: var(--font-display); font-weight: 800;
+    font-size: clamp(38px, 4.8vw, 70px);
+    line-height: 1.12; letter-spacing: -0.02em;
+    margin-bottom: 20px;
+  }
+  .display-lg {
+    font-family: var(--font-display); font-weight: 800;
+    font-size: clamp(34px, 4vw, 58px);
+    line-height: 1.14; letter-spacing: -0.018em;
+    margin-bottom: 18px;
+  }
+  .display-md {
+    font-family: var(--font-display); font-weight: 800;
+    font-size: clamp(28px, 3vw, 44px);
+    line-height: 1.24; letter-spacing: -0.015em;
+    margin-bottom: 16px;
+  }
+  .subhead {
+    font-family: var(--font-sans); font-weight: 500;
+    font-size: clamp(17px, 1.7vw, 23px);
+    line-height: 1.55; letter-spacing: -0.008em;
+    color: var(--body); margin-bottom: 24px;
+  }
+  .bg-dark .subhead, .bg-dark-soft .subhead { color: var(--on-dark-soft); }
+
+  .body {
+    font-family: var(--font-sans); font-weight: 400;
+    font-size: clamp(16px, 1.55vw, 21px);
+    line-height: 1.75; letter-spacing: -0.003em;
+    color: var(--body);
+  }
+  .bg-dark .body, .bg-dark-soft .body { color: var(--on-dark-soft); }
+  .strong { font-weight: 600; color: var(--ink); }
+  .bg-dark .strong, .bg-dark-soft .strong { color: var(--on-dark); }
+
+  .scripture { margin-top: 24px; padding-left: 20px; border-left: 4px solid var(--primary); }
+  .scripture .quote {
+    font-family: var(--font-display); font-weight: 700;
+    font-size: clamp(19px, 2vw, 27px);
+    line-height: 1.45; letter-spacing: -0.01em;
+  }
+  .scripture .cite {
+    margin-top: 10px;
+    font-family: var(--font-sans); font-weight: 700;
+    font-size: clamp(13px, 1.1vw, 16px); letter-spacing: 0.08em;
+    text-transform: uppercase; color: var(--muted);
+  }
+  .bg-dark .scripture .cite, .bg-dark-soft .scripture .cite { color: var(--on-dark-soft); }
+
+  .key-pull {
+    font-family: var(--font-display); font-weight: 800;
+    font-size: clamp(30px, 3.6vw, 52px);
+    line-height: 1.2; letter-spacing: -0.018em;
+    margin-bottom: 24px;
+  }
+
+  .qline { display: grid; grid-template-columns: 56px 1fr; gap: 18px; padding: 16px 0; align-items: baseline; }
+  .qline + .qline { border-top: 1px solid var(--hairline); }
+  .bg-dark .qline + .qline, .bg-dark-soft .qline + .qline { border-top: 1px solid rgba(255,255,255,0.08); }
+  .qnum {
+    font-family: var(--font-sans); font-weight: 700;
+    font-size: clamp(15px, 1.3vw, 19px); letter-spacing: 0.08em;
+    color: var(--primary);
+  }
+  .qtext {
+    font-family: var(--font-sans); font-weight: 500;
+    font-size: clamp(17px, 1.7vw, 22px); line-height: 1.55; letter-spacing: -0.005em;
+  }
+
+  .prayer-text {
+    font-family: var(--font-display); font-weight: 700;
+    font-size: clamp(24px, 2.6vw, 36px);
+    line-height: 1.45; letter-spacing: -0.015em;
+  }
+  .prayer-divider { width: 72px; height: 3px; background: var(--primary); margin: 34px 0 26px; }
+  .amen {
+    display: inline-block; margin-top: 20px;
+    font-family: var(--font-sans); font-weight: 700;
+    font-size: clamp(15px, 1.2vw, 18px); letter-spacing: 0.1em;
+    text-transform: uppercase; color: var(--muted);
+  }
+  .bg-dark .amen, .bg-dark-soft .amen { color: var(--on-dark-soft); }
+
+  .day-illustration { width: 100%; max-width: 480px; aspect-ratio: 1 / 1; }
+  .day-illustration svg { width: 100%; height: 100%; display: block; }
+
+  .watermark-stage { position: relative; min-height: 100%; width: 100%; }
+  .watermark {
+    position: absolute; inset: 0;
+    display: flex; align-items: center; justify-content: flex-end;
+    pointer-events: none; opacity: 0.18;
+  }
+  .watermark svg { width: 70%; max-width: 700px; height: auto; transform: translateX(8%); }
+  .bg-dark .watermark { opacity: 0.22; }
+  .watermark-content { position: relative; z-index: 2; max-width: 760px; }
+
+  .full-typo {
+    font-family: var(--font-display); font-weight: 800;
+    font-size: clamp(56px, 8.5vw, 140px);
+    line-height: 1.0; letter-spacing: -0.03em;
+    text-align: center;
+    color: var(--ink);
+  }
+  .full-typo .accent { color: var(--primary); }
+  .bg-dark .full-typo { color: var(--on-dark); }
+  .full-typo-sub {
+    margin-top: 28px;
+    font-family: var(--font-sans); font-weight: 500;
+    font-size: clamp(17px, 1.6vw, 22px);
+    letter-spacing: 0.01em; color: var(--muted);
+    text-align: center;
+  }
+
+  .med-split { display: grid; grid-template-columns: 1fr 1fr; gap: clamp(32px, 4vw, 64px); align-items: start; }
+  .quote-col .quote {
+    font-family: var(--font-display); font-weight: 800;
+    font-size: clamp(26px, 3vw, 42px);
+    line-height: 1.3; letter-spacing: -0.015em; color: var(--ink);
+  }
+  .quote-col .cite {
+    margin-top: 18px;
+    font-family: var(--font-sans); font-weight: 700;
+    font-size: clamp(13px, 1.1vw, 16px); letter-spacing: 0.08em;
+    text-transform: uppercase; color: var(--primary);
+  }
+  .commentary-col p {
+    font-family: var(--font-sans); font-weight: 400;
+    font-size: clamp(16px, 1.5vw, 20px); line-height: 1.8;
+    color: var(--body);
+  }
+  .commentary-col p + p { margin-top: 18px; }
+  .drop-cap::first-letter {
+    font-family: var(--font-display); font-weight: 800;
+    font-size: 4.4em; float: left;
+    line-height: 0.9; padding: 6px 14px 0 0;
+    color: var(--primary);
+  }
+
+  .three-words {
+    display: flex; align-items: center; justify-content: center;
+    gap: clamp(20px, 4vw, 60px);
+    font-family: var(--font-display); font-weight: 800;
+    font-size: clamp(40px, 5.6vw, 88px);
+    line-height: 1.0; letter-spacing: -0.02em;
+    color: var(--on-dark);
+  }
+  .three-words .word { display: inline-block; }
+  .three-words .word.muted { color: var(--on-dark-soft); }
+  .three-words .dot { color: var(--primary); font-size: 0.6em; transform: translateY(-0.2em); }
+
+  .day-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 14px; margin-top: 32px; max-width: 1100px; }
+  .day-tile {
+    padding: 22px 18px; border-radius: 14px;
+    border: 1px solid var(--hairline); background: var(--canvas);
+    display: flex; flex-direction: column; gap: 8px; min-height: 200px;
+    transition: border-color 0.2s ease, transform 0.2s ease;
+    cursor: pointer;
+  }
+  .day-tile:hover { border-color: var(--primary); transform: translateY(-2px); }
+  .day-tile:focus-visible { outline: 2px solid var(--primary); outline-offset: 3px; }
+  .day-tile:active { transform: translateY(0); }
+  .day-tile .num { font-family: var(--font-sans); font-weight: 700; font-size: 13px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--primary); }
+  .day-tile .scrip { font-family: var(--font-sans); font-weight: 700; font-size: 12px; letter-spacing: 0.06em; text-transform: uppercase; color: var(--muted); }
+  .day-tile .ttl { font-family: var(--font-display); font-weight: 800; font-size: 22px; line-height: 1.2; letter-spacing: -0.015em; margin-top: auto; }
+
+  .corner {
+    position: absolute; bottom: 20px; z-index: 5;
+    font-family: var(--font-sans); font-weight: 700;
+    font-size: 13px; letter-spacing: 0.08em; text-transform: uppercase;
+    color: var(--muted); pointer-events: none;
+  }
+  .deck.dark-mode .corner { color: var(--on-dark-soft); }
+  .corner.left { left: clamp(28px, 5vw, 60px); }
+  .corner.right { right: clamp(28px, 5vw, 60px); font-variant-numeric: tabular-nums; }
+
+  .nav-zone { position: absolute; top: 0; bottom: 0; width: 18%; z-index: 30; cursor: pointer; }
+  .nav-zone.left { left: 0; }
+  .nav-zone.right { right: 0; }
+  .nav-zone .arrow {
+    position: absolute; top: 50%; transform: translateY(-50%);
+    width: 44px; height: 44px; border-radius: 8px;
+    background: rgba(20,20,19,0.06); color: var(--ink);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 18px; opacity: 0; transition: opacity 0.25s;
+  }
+  .nav-zone.left .arrow { left: 16px; }
+  .nav-zone.right .arrow { right: 16px; }
+  .nav-zone:hover .arrow { opacity: 1; }
+  .deck.dark-mode .nav-zone .arrow { background: rgba(255,255,255,0.12); color: var(--on-dark); }
+
+  .build { opacity: 0; transform: translateY(12px); transition: opacity 0.5s ease, transform 0.5s cubic-bezier(.2,.7,.3,1); }
+  .slide.is-current .build { opacity: 1; transform: translateY(0); }
+  .slide.is-current .build:nth-of-type(1) { transition-delay: 0.08s; }
+  .slide.is-current .build:nth-of-type(2) { transition-delay: 0.18s; }
+  .slide.is-current .build:nth-of-type(3) { transition-delay: 0.28s; }
+  .slide.is-current .build:nth-of-type(4) { transition-delay: 0.38s; }
+  .slide.is-current .build:nth-of-type(5) { transition-delay: 0.48s; }
+
+  @media (max-width: 833px) {
+    .stage { background: var(--canvas); }
+    .deck { aspect-ratio: auto; width: 100vw; height: 100dvh; max-height: 100dvh; }
+    @supports not (height: 100dvh) { .deck { height: 100vh; max-height: 100vh; } }
+    .slide {
+      padding: 56px 22px calc(72px + env(safe-area-inset-bottom));
+      align-items: flex-start;
+    }
+    .two-col, .two-col.flip { grid-template-columns: 1fr; gap: 22px; align-items: start; }
+    .two-col.flip .day-illustration { grid-column: 1; grid-row: 2; }
+    .two-col.flip .copy { grid-column: 1; grid-row: 1; }
+    .day-illustration { max-width: 180px; margin: 8px auto 0; }
+    .day-grid { grid-template-columns: 1fr; gap: 10px; margin-top: 22px; max-width: 100%; }
+    .day-tile {
+      min-height: auto; flex-direction: row; align-items: center; gap: 12px; padding: 16px 18px;
+    }
+    .day-tile .ttl { margin-top: 0; font-size: 17px; flex: 1; }
+    .day-tile .num, .day-tile .scrip { font-size: 11px; white-space: nowrap; }
+
+    .corner { font-size: 11px; bottom: calc(20px + env(safe-area-inset-bottom)); letter-spacing: 0.06em; }
+    .corner.left { left: 16px; max-width: 62%; }
+    .corner.right { right: 16px; }
+
+    .nav-zone { width: 14%; }
+    .nav-zone .arrow { width: 36px; height: 36px; font-size: 16px; }
+
+    .display-2xl { font-size: clamp(40px, 10vw, 60px); }
+    .display-xl { font-size: clamp(34px, 8.5vw, 52px); }
+    .display-lg { font-size: clamp(30px, 7.5vw, 44px); }
+    .display-md { font-size: clamp(26px, 6.5vw, 38px); }
+    .key-pull { font-size: clamp(26px, 6.5vw, 36px); }
+    .subhead { font-size: clamp(16px, 4.4vw, 21px); }
+    .body { font-size: clamp(15px, 4vw, 18px); }
+    .scripture .quote { font-size: clamp(18px, 4.6vw, 23px); }
+    .scripture .cite { font-size: clamp(12px, 3.2vw, 15px); }
+    .qtext { font-size: clamp(16px, 4.2vw, 19px); }
+    .qnum { font-size: clamp(14px, 3.4vw, 16px); }
+    .prayer-text { font-size: clamp(21px, 5.4vw, 27px); }
+    .label { font-size: clamp(12px, 3.2vw, 16px); }
+
+    .full-typo { font-size: clamp(48px, 13vw, 76px); }
+    .full-typo-sub { font-size: clamp(15px, 3.8vw, 18px); }
+    .three-words { flex-direction: column; gap: 12px; font-size: clamp(40px, 11vw, 60px); }
+    .three-words .dot { display: none; }
+
+    .med-split { grid-template-columns: 1fr; gap: 28px; }
+    .quote-col .quote { font-size: clamp(23px, 6vw, 30px); }
+    .commentary-col p { font-size: clamp(15px, 4vw, 18px); }
+    .drop-cap::first-letter { font-size: 3.4em; }
+
+    .watermark svg { width: 90%; transform: translateX(0); }
+    .watermark { opacity: 0.12; align-items: flex-start; padding-top: 30%; }
+  }
+  @media (max-width: 833px) and (orientation: landscape) {
+    .slide { padding: 24px 32px 40px; }
+    .two-col, .two-col.flip { grid-template-columns: 1.1fr 1fr; gap: 18px; }
+    .day-illustration { max-width: 220px; }
+    .three-words { flex-direction: row; gap: 24px; }
+    .three-words .dot { display: inline; }
+  }
+</style>
+</head>
+<body>
+
+<svg width="0" height="0" style="position: absolute;">
+  <defs>
+    <!-- Day 1: Forked road — a change of direction (conversion) -->
+    <symbol id="day1-svg" viewBox="0 0 1024 1024">
+      <path d="M 512 880 L 512 540" stroke="#cc785c" stroke-width="5" fill="none" stroke-linecap="round"/>
+      <path d="M 512 540 Q 512 380 300 180" stroke="#cc785c" stroke-width="5" fill="none" stroke-linecap="round" opacity="0.32" stroke-dasharray="10 16"/>
+      <path d="M 512 540 Q 560 360 760 200" stroke="#cc785c" stroke-width="6" fill="none" stroke-linecap="round"/>
+      <circle cx="512" cy="540" r="20" fill="#cc785c"/>
+      <circle cx="760" cy="200" r="14" fill="#cc785c"/>
+      <path d="M 700 180 L 770 195 L 740 250" stroke="#cc785c" stroke-width="5" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+    </symbol>
+    <!-- Day 2: Bursting light — meeting the risen Lord, proclaiming at once -->
+    <symbol id="day2-svg" viewBox="0 0 1024 1024">
+      <circle cx="512" cy="512" r="40" fill="#cc785c"/>
+      <g stroke="#cc785c" stroke-width="5" stroke-linecap="round">
+        <line x1="512" y1="170" x2="512" y2="300"/>
+        <line x1="512" y1="724" x2="512" y2="854"/>
+        <line x1="170" y1="512" x2="300" y2="512"/>
+        <line x1="724" y1="512" x2="854" y2="512"/>
+        <line x1="270" y1="270" x2="362" y2="362"/>
+        <line x1="754" y1="270" x2="662" y2="362"/>
+        <line x1="270" y1="754" x2="362" y2="662"/>
+        <line x1="754" y1="754" x2="662" y2="662"/>
+      </g>
+      <circle cx="512" cy="512" r="150" stroke="#cc785c" stroke-width="2.5" fill="none" opacity="0.35"/>
+      <circle cx="512" cy="512" r="230" stroke="#cc785c" stroke-width="2" fill="none" opacity="0.2"/>
+    </symbol>
+    <!-- Day 3: A bridge joining two points — Barnabas, the connector -->
+    <symbol id="day3-svg" viewBox="0 0 1024 1024">
+      <circle cx="200" cy="620" r="40" fill="#cc785c"/>
+      <circle cx="824" cy="620" r="40" fill="#cc785c"/>
+      <path d="M 200 620 Q 512 300 824 620" stroke="#cc785c" stroke-width="6" fill="none" stroke-linecap="round"/>
+      <line x1="320" y1="538" x2="320" y2="620" stroke="#cc785c" stroke-width="3" opacity="0.5"/>
+      <line x1="430" y1="478" x2="430" y2="620" stroke="#cc785c" stroke-width="3" opacity="0.5"/>
+      <line x1="512" y1="458" x2="512" y2="620" stroke="#cc785c" stroke-width="3" opacity="0.5"/>
+      <line x1="594" y1="478" x2="594" y2="620" stroke="#cc785c" stroke-width="3" opacity="0.5"/>
+      <line x1="704" y1="538" x2="704" y2="620" stroke="#cc785c" stroke-width="3" opacity="0.5"/>
+    </symbol>
+    <!-- Day 4: Roots underground — the decade in Tarsus, hidden yet prepared -->
+    <symbol id="day4-svg" viewBox="0 0 1024 1024">
+      <line x1="160" y1="470" x2="864" y2="470" stroke="#cc785c" stroke-width="3" opacity="0.4" stroke-dasharray="8 12"/>
+      <line x1="512" y1="470" x2="512" y2="250" stroke="#cc785c" stroke-width="5" stroke-linecap="round"/>
+      <path d="M 512 250 Q 470 200 430 215" stroke="#cc785c" stroke-width="5" fill="none" stroke-linecap="round"/>
+      <path d="M 512 290 Q 560 240 600 260" stroke="#cc785c" stroke-width="5" fill="none" stroke-linecap="round"/>
+      <path d="M 512 470 Q 480 620 360 760" stroke="#cc785c" stroke-width="5" fill="none" stroke-linecap="round" opacity="0.75"/>
+      <path d="M 512 470 Q 540 640 660 780" stroke="#cc785c" stroke-width="5" fill="none" stroke-linecap="round" opacity="0.75"/>
+      <path d="M 512 470 L 512 800" stroke="#cc785c" stroke-width="5" fill="none" stroke-linecap="round" opacity="0.9"/>
+      <path d="M 430 700 Q 470 780 470 840" stroke="#cc785c" stroke-width="3" fill="none" stroke-linecap="round" opacity="0.4"/>
+      <path d="M 590 700 Q 560 780 560 840" stroke="#cc785c" stroke-width="3" fill="none" stroke-linecap="round" opacity="0.4"/>
+    </symbol>
+    <!-- Day 5: Light leaking through the cracks — the cardboard box, weakness -->
+    <symbol id="day5-svg" viewBox="0 0 1024 1024">
+      <rect x="312" y="360" width="400" height="380" rx="14" stroke="#cc785c" stroke-width="5" fill="none"/>
+      <path d="M 470 360 L 430 540 L 540 560 L 500 740" stroke="#cc785c" stroke-width="4" fill="none" stroke-linecap="round" stroke-linejoin="round" opacity="0.6"/>
+      <g stroke="#cc785c" stroke-width="4" stroke-linecap="round">
+        <line x1="500" y1="320" x2="500" y2="240"/>
+        <line x1="430" y1="335" x2="392" y2="270"/>
+        <line x1="572" y1="335" x2="610" y2="270"/>
+        <line x1="370" y1="380" x2="300" y2="345"/>
+        <line x1="632" y1="380" x2="702" y2="345"/>
+      </g>
+      <circle cx="500" cy="200" r="44" fill="#cc785c" opacity="0.9"/>
+    </symbol>
+  </defs>
+</svg>
+
+<div class="stage">
+  <div class="deck" id="deck">
+    <div class="corner left">Forgotten Time, Prepared Time · 5-Day Devotional</div>
+    <div class="corner right"><span id="curIdx">1</span> / <span id="totIdx">18</span></div>
+    <div class="nav-zone left" id="navLeft"><div class="arrow">←</div></div>
+    <div class="nav-zone right" id="navRight"><div class="arrow">→</div></div>
+
+    <div class="reel" id="reel">
+
+      <!-- 1. INTRO A — the big question -->
+      <section class="slide bg-canvas" data-bg="light">
+        <div class="slide-inner">
+          <div class="label build">Acts 9:19b–31 · Saul's Conversion and the Decade in Tarsus</div>
+          <h1 class="display-2xl build">When no one<br/>is looking for you,<br/>is that time<br/>wasted?</h1>
+          <p class="subhead build" style="max-width: 760px;">
+            Even Saul, transformed from persecutor to apostle, had a forgotten decade — years over which Scripture falls silent.
+          </p>
+        </div>
+      </section>
+
+      <!-- 2. INTRO B — the 5-day grid -->
+      <section class="slide bg-canvas" data-bg="light">
+        <div class="slide-inner">
+          <div class="label build">Five Days of Reflection</div>
+          <h2 class="display-lg build">One week, together —<br/>one step at a time.</h2>
+          <p class="body build" style="margin-top: 8px;">
+            One short reading each day — a verse from the text, a single sentence, a brief meditation and a prayer.
+          </p>
+          <div class="day-grid build">
+            <div class="day-tile" data-goto="2" role="button" tabindex="0"><span class="num">DAY 01</span><span class="scrip">Gal 1:14</span><span class="ttl">Zeal Can Be an Idol.</span></div>
+            <div class="day-tile" data-goto="5" role="button" tabindex="0"><span class="num">DAY 02</span><span class="scrip">Acts 9:20</span><span class="ttl">Immediately, He Proclaimed.</span></div>
+            <div class="day-tile" data-goto="9" role="button" tabindex="0"><span class="num">DAY 03</span><span class="scrip">Acts 9:27</span><span class="ttl">The One Who Vouched.</span></div>
+            <div class="day-tile" data-goto="12" role="button" tabindex="0"><span class="num">DAY 04</span><span class="scrip">Acts 9:30</span><span class="ttl">Forgotten, Yet Prepared.</span></div>
+            <div class="day-tile" data-goto="15" role="button" tabindex="0"><span class="num">DAY 05</span><span class="scrip">2 Cor 12:9</span><span class="ttl">Light Through Weakness.</span></div>
+          </div>
+        </div>
+      </section>
+
+      <!-- DAY 1 — flip layout -->
+      <section class="slide bg-canvas" data-bg="light">
+        <div class="slide-inner two-col flip">
+          <div class="day-illustration build"><svg><use href="#day1-svg"/></svg></div>
+          <div class="copy">
+            <div class="label build">DAY 01 · Zeal Can Be an Idol</div>
+            <h2 class="display-xl build">Burning zeal,<br/>aimed the<br/>wrong way.</h2>
+            <p class="subhead build">Saul believed he lived for God more than anyone — yet he was intoxicated with his own righteousness.</p>
+            <div class="scripture build">
+              <p class="quote">"And I was advancing in Judaism beyond many of my own age among my people, so extremely zealous was I for the traditions of my fathers."</p>
+              <p class="cite">Galatians 1:14 · ESV</p>
+            </div>
+          </div>
+        </div>
+      </section>
+      <section class="slide bg-canvas" data-bg="light">
+        <div class="slide-inner">
+          <div class="label build">DAY 01 · Meditation</div>
+          <h3 class="key-pull build">Self-worship in the name of religion<br/>is the most cleverly disguised idolatry.</h3>
+          <p class="body build" style="margin-top: 18px;">
+            We can worship God and still be practicing idolatry. If we believe in Jesus merely as a ticket to heaven, or as a means to a more comfortable life, then our desires are no different from the world's.
+          </p>
+          <p class="body build" style="margin-top: 14px;">
+            That was Saul before his conversion. <span class="strong">He thought himself pure and passionate, yet the sword he wielded was piercing the Lord of life himself.</span> When zeal points the wrong way, the zeal itself becomes sin.
+          </p>
+        </div>
+      </section>
+      <section class="slide bg-card" data-bg="light">
+        <div class="slide-inner">
+          <div class="label build">DAY 01 · Reflect + Pray</div>
+          <h3 class="display-md build">Re-examine the direction of your faith.</h3>
+          <div class="qline build">
+            <span class="qnum">01</span>
+            <span class="qtext">What am I really believing in Jesus for? Is there a hidden desire of my own buried in that motive?</span>
+          </div>
+          <div class="qline build">
+            <span class="qnum">02</span>
+            <span class="qtext">Among the things I call "zeal for God," is there anything that is, in truth, for myself?</span>
+          </div>
+          <div class="prayer-divider build"></div>
+          <p class="prayer-text build">
+            Lord, let me see honestly where my zeal is aimed.<br/>
+            Make my faith a life for you, not a faith for myself.
+          </p>
+          <span class="amen build">Amen.</span>
+        </div>
+      </section>
+
+      <!-- DAY 2 — hero / meditation / full-bleed typo / reflect -->
+      <section class="slide bg-canvas" data-bg="light">
+        <div class="slide-inner two-col">
+          <div>
+            <div class="label build">DAY 02 · Immediately, He Proclaimed</div>
+            <h2 class="display-xl build">Once you have met him,<br/>you cannot<br/>stay silent.</h2>
+            <p class="subhead build">Having met the risen Lord on the Damascus road, Saul proclaimed at once — knowing exactly what it would cost.</p>
+            <div class="scripture build">
+              <p class="quote">"And immediately he proclaimed Jesus in the synagogues, saying, 'He is the Son of God.'"</p>
+              <p class="cite">Acts 9:20 · ESV</p>
+            </div>
+          </div>
+          <div class="day-illustration build"><svg><use href="#day2-svg"/></svg></div>
+        </div>
+      </section>
+      <section class="slide bg-canvas" data-bg="light">
+        <div class="slide-inner">
+          <div class="label build">DAY 02 · Meditation</div>
+          <h3 class="key-pull build">Whoever has met the risen Lord<br/>can never live as before.</h3>
+          <p class="body build" style="margin-top: 18px;">
+            Saul surely knew what his change of allegiance would unleash. Yesterday's ally would become today's enemy; everything he had built would be lost.
+          </p>
+          <p class="body build" style="margin-top: 14px;">
+            And yet he proclaimed "immediately." No — <span class="strong">he could not do otherwise.</span> For the one who has met the risen Lord, silence is no longer an option.
+          </p>
+        </div>
+      </section>
+      <section class="slide bg-canvas" data-bg="light">
+        <div class="slide-inner center">
+          <p class="full-typo build">At<br/>once<span class="accent">.</span></p>
+          <p class="full-typo-sub build">— For him, there was no reason to wait.</p>
+        </div>
+      </section>
+      <section class="slide bg-card" data-bg="light">
+        <div class="slide-inner">
+          <div class="label build">DAY 02 · Reflect + Pray</div>
+          <h3 class="display-md build">Examine the silence of your lips.</h3>
+          <div class="qline build">
+            <span class="qnum">01</span>
+            <span class="qtext">Is there a place where I have failed to speak the gospel — afraid of the cost, or waiting for a "better time"?</span>
+          </div>
+          <div class="qline build">
+            <span class="qnum">02</span>
+            <span class="qtext">If I have truly met the risen Lord in person, what should be different about today?</span>
+          </div>
+          <div class="prayer-divider build"></div>
+          <p class="prayer-text build">
+            Lord, let my encounter with you become real change.<br/>
+            Give me lips that proclaim you boldly, whatever the cost.
+          </p>
+          <span class="amen build">Amen.</span>
+        </div>
+      </section>
+
+      <!-- DAY 3 — full dark, watermark -->
+      <section class="slide bg-dark" data-bg="dark">
+        <div class="slide-inner watermark-stage">
+          <div class="watermark"><svg><use href="#day3-svg"/></svg></div>
+          <div class="watermark-content">
+            <div class="label build">DAY 03 · The One Who Vouched</div>
+            <h2 class="display-xl build">One person's word<br/>opened a closed door.</h2>
+            <p class="subhead build">When no one would believe Saul, Barnabas staked his own name to vouch for him.</p>
+            <div class="scripture build">
+              <p class="quote">"But Barnabas took him and brought him to the apostles and declared to them how on the road he had seen the Lord… and how he had preached boldly in the name of Jesus."</p>
+              <p class="cite">Acts 9:27 · ESV</p>
+            </div>
+          </div>
+        </div>
+      </section>
+      <section class="slide bg-dark-soft" data-bg="dark">
+        <div class="slide-inner">
+          <div class="label build">DAY 03 · Meditation</div>
+          <h3 class="key-pull build">God looks less at what we achieved,<br/>and more at how we ran the race.</h3>
+          <p class="body build" style="margin-top: 18px;">
+            The disciples in Jerusalem could not believe Saul's conversion. Three years had not erased the memory of the man who led the charge in killing Stephen.
+          </p>
+          <p class="body build" style="margin-top: 14px;">
+            Then Barnabas, the "son of encouragement," stepped forward. <span class="strong">A trusted man staked his own name to vouch for Saul.</span> God asks not whom we outran, but whom we walked beside.
+          </p>
+        </div>
+      </section>
+      <section class="slide bg-dark" data-bg="dark">
+        <div class="slide-inner">
+          <div class="label build">DAY 03 · Reflect + Pray</div>
+          <h3 class="display-md build">Become someone's Barnabas.</h3>
+          <div class="qline build">
+            <span class="qnum">01</span>
+            <span class="qtext">Is there someone in the church I find hard to believe in — someone I am quietly pushing away?</span>
+          </div>
+          <div class="qline build">
+            <span class="qnum">02</span>
+            <span class="qtext">Who is the one person I could lift up by staking my own trust and name as a bridge for them?</span>
+          </div>
+          <div class="prayer-divider build"></div>
+          <p class="prayer-text build">
+            Lord, let vouching come before judging in me.<br/>
+            Use me as a bridge of encouragement to mend broken bonds.
+          </p>
+          <span class="amen build">Amen.</span>
+        </div>
+      </section>
+
+      <!-- DAY 4 — cream recovery, drop cap 2-col -->
+      <section class="slide bg-canvas" data-bg="light">
+        <div class="slide-inner two-col">
+          <div>
+            <div class="label build">DAY 04 · Forgotten, Yet Prepared</div>
+            <h2 class="display-xl build">A silent decade<br/>upheld twenty<br/>years of ministry.</h2>
+            <p class="subhead build">Over the decade in Tarsus, where Saul returned in disgrace, Scripture is silent — yet God was at work.</p>
+          </div>
+          <div class="day-illustration build"><svg><use href="#day4-svg"/></svg></div>
+        </div>
+      </section>
+      <section class="slide bg-canvas" data-bg="light">
+        <div class="slide-inner">
+          <div class="label build">DAY 04 · Meditation</div>
+          <div class="med-split">
+            <div class="quote-col build">
+              <p class="quote">"And when the brothers learned this, they brought him down to Caesarea and sent him off to Tarsus."</p>
+              <p class="cite">Acts 9:30 · ESV</p>
+            </div>
+            <div class="commentary-col build">
+              <p class="drop-cap drop-cap-body">Saul returned in disgrace to the hometown that had expected a hero. And there he spent more than ten years — years over which Scripture is utterly silent.</p>
+              <p>Yet in that forgotten time God was ripening Saul's theology. <span class="strong">The place that looked like a dead stop was in fact the base camp that would carry the rest of his ministry.</span></p>
+            </div>
+          </div>
+        </div>
+      </section>
+      <section class="slide bg-card-deep" data-bg="light">
+        <div class="slide-inner">
+          <div class="label build">DAY 04 · Reflect + Pray</div>
+          <h3 class="display-md build">Reinterpret your wilderness season.</h3>
+          <div class="qline build">
+            <span class="qnum">01</span>
+            <span class="qtext">Where is my "Tarsus" right now — a season that feels stalled, hidden, or forgotten?</span>
+          </div>
+          <div class="qline build">
+            <span class="qnum">02</span>
+            <span class="qtext">If I read that season by the Father's word rather than the world's eyes, what changes?</span>
+          </div>
+          <div class="prayer-divider build"></div>
+          <p class="prayer-text build">
+            Lord, let me read forgotten time as prepared time.<br/>
+            Help me trust your faithful shaping, even where it is unseen.
+          </p>
+          <span class="amen build">Amen.</span>
+        </div>
+      </section>
+
+      <!-- DAY 5 — hero / three words / closing -->
+      <section class="slide bg-canvas" data-bg="light">
+        <div class="slide-inner two-col flip">
+          <div class="day-illustration build"><svg><use href="#day5-svg"/></svg></div>
+          <div class="copy">
+            <div class="label build">DAY 05 · Light Through Weakness</div>
+            <h2 class="display-xl build">Light spills out<br/>through the cracks.</h2>
+            <p class="subhead build">The less we hold, the more gloriously Christ is revealed through our weakness.</p>
+            <div class="scripture build">
+              <p class="quote">"My grace is sufficient for you, for my power is made perfect in weakness… I will boast all the more gladly of my weaknesses, so that the power of Christ may rest upon me."</p>
+              <p class="cite">2 Corinthians 12:9 · ESV</p>
+            </div>
+          </div>
+        </div>
+      </section>
+      <section class="slide bg-dark" data-bg="dark">
+        <div class="slide-inner center">
+          <p class="three-words build">
+            <span class="word">Direction</span>
+            <span class="dot">·</span>
+            <span class="word">Waiting</span>
+            <span class="dot">·</span>
+            <span class="word">Weakness</span>
+          </p>
+          <p class="full-typo-sub build" style="color: var(--on-dark-soft); margin-top: 32px;">
+            The three things that shaped Saul — and the same hand shaping us today.
+          </p>
+        </div>
+      </section>
+      <section class="slide bg-dark" data-bg="dark">
+        <div class="slide-inner">
+          <div class="label build">DAY 05 · Closing Meditation + Prayer</div>
+          <h3 class="display-md build" style="margin-bottom: 28px;">Take one thing<br/>from this week's reflection.</h3>
+          <p class="body build" style="margin-bottom: 28px;">
+            The cardboard box shone with light only after it was crushed. <span class="strong">A seed's true power is released only when the seed dies.</span> The world relentlessly attacks our weak places, but God works through those very weaknesses — to save me, to save you, to save the world.
+          </p>
+          <div class="qline build">
+            <span class="qnum">01</span>
+            <span class="qtext">What weakness does the world attack in me? How might that very place become where light spills out?</span>
+          </div>
+          <div class="qline build">
+            <span class="qnum">02</span>
+            <span class="qtext">Like the transformed Paul, will you resolve to sing of the living Jesus with the whole of your life?</span>
+          </div>
+          <div class="prayer-divider build"></div>
+          <p class="prayer-text build">
+            Lord, let your power be revealed through my weakness.<br/>
+            Make me one who sings of the living Jesus with my whole life.
+          </p>
+          <span class="amen build">Amen.</span>
+        </div>
+      </section>
+
+    </div>
+  </div>
+</div>
+
+<script>
+  const deck = document.getElementById("deck");
+  const slides = Array.from(document.querySelectorAll(".slide"));
+  const total = slides.length;
+  const curEl = document.getElementById("curIdx");
+  const totEl = document.getElementById("totIdx");
+  totEl.textContent = total;
+  let cur = 0;
+  function applyMode() {
+    const isDark = (slides[cur].dataset.bg || "light") === "dark";
+    deck.classList.toggle("dark-mode", isDark);
+  }
+  function snapPositions(activeIdx) {
+    slides.forEach((s, i) => {
+      s.classList.remove("is-current", "is-prev", "is-next", "is-animating");
+      if (i === activeIdx) s.classList.add("is-current");
+      else if (i < activeIdx) s.classList.add("is-prev");
+      else s.classList.add("is-next");
+    });
+  }
+  function go(idx, push = true) {
+    idx = Math.max(0, Math.min(total - 1, idx));
+    if (idx === cur && slides[cur].classList.contains("is-current")) return;
+    const dir = idx >= cur ? "fwd" : "back";
+    const oldCur = cur;
+    slides.forEach((s, i) => {
+      if (i === oldCur || i === idx) return;
+      s.classList.remove("is-current", "is-prev", "is-next", "is-animating");
+      if (i < idx) s.classList.add("is-prev");
+      else s.classList.add("is-next");
+    });
+    const out = slides[oldCur], inc = slides[idx];
+    out.classList.add("is-animating"); inc.classList.add("is-animating");
+    requestAnimationFrame(() => {
+      out.classList.remove("is-current");
+      out.classList.add(dir === "fwd" ? "is-prev" : "is-next");
+      inc.classList.remove("is-prev", "is-next");
+      inc.classList.add("is-current");
+    });
+    cur = idx;
+    curEl.textContent = cur + 1;
+    applyMode();
+    if (push) history.replaceState(null, "", `#${cur + 1}`);
+  }
+  const initialHash = parseInt(location.hash.replace("#", ""), 10);
+  const startIdx = Number.isFinite(initialHash) && initialHash >= 1 ? Math.min(initialHash - 1, total - 1) : 0;
+  cur = startIdx;
+  snapPositions(startIdx);
+  curEl.textContent = cur + 1;
+  applyMode();
+  function next() { go(cur + 1); }
+  function prev() { go(cur - 1); }
+  document.addEventListener("keydown", (e) => {
+    switch (e.key) {
+      case "ArrowRight": case " ": case "PageDown": e.preventDefault(); next(); break;
+      case "ArrowLeft": case "PageUp": e.preventDefault(); prev(); break;
+      case "Home": e.preventDefault(); go(0); break;
+      case "End": e.preventDefault(); go(total - 1); break;
+      case "f": case "F":
+        if (!document.fullscreenElement) document.documentElement.requestFullscreen?.();
+        else document.exitFullscreen?.();
+        break;
+    }
+  });
+  document.getElementById("navLeft").addEventListener("click", prev);
+  document.getElementById("navRight").addEventListener("click", next);
+
+  document.querySelectorAll(".day-tile[data-goto]").forEach(tile => {
+    const handler = (e) => {
+      e.preventDefault();
+      go(parseInt(tile.dataset.goto, 10));
+    };
+    tile.addEventListener("click", handler);
+    tile.addEventListener("keydown", (e) => {
+      if (e.key === "Enter" || e.key === " ") handler(e);
+    });
+  });
+  let tx = null;
+  deck.addEventListener("touchstart", (e) => { tx = e.touches[0].clientX; }, { passive: true });
+  deck.addEventListener("touchend", (e) => {
+    if (tx === null) return;
+    const dx = e.changedTouches[0].clientX - tx;
+    if (Math.abs(dx) > 60) (dx < 0 ? next : prev)();
+    tx = null;
+  });
+</script>
+</body>
+</html>
