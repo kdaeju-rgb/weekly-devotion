@@ -1,0 +1,685 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>5-Day Devotional — Built on the Road (Acts 13:1-3)</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --primary: #cc785c;
+    --canvas: #faf9f5;
+    --card: #efe9de;
+    --dark: #181715;
+    --ink: #141413;
+    --body: #3d3d3a;
+    --muted: #6c6a64;
+    --on-dark: #faf9f5;
+    --on-dark-soft: #a09d96;
+    --hairline: #e6dfd8;
+    --font-display: "Playfair Display", Georgia, serif;
+    --font-sans: "Inter", -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body { height: 100%; overflow: hidden; font-family: var(--font-sans); background: #1a1a1a; -webkit-font-smoothing: antialiased; }
+
+  .stage {
+    position: fixed; inset: 0;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .deck {
+    position: relative;
+    aspect-ratio: 16 / 9;
+    width: 100vw; height: auto;
+    max-height: 100vh;
+    background: var(--canvas);
+    overflow: hidden;
+  }
+  @supports not (aspect-ratio: 16 / 9) {
+    .deck { width: 100vw; height: 56.25vw; }
+  }
+
+  .reel { position: relative; width: 100%; height: 100%; perspective: 1800px; transform-style: preserve-3d; }
+  .slide {
+    position: absolute; inset: 0;
+    display: flex; align-items: center;
+    padding: clamp(28px, 4.5vh, 60px) clamp(36px, 5.5vw, 90px);
+    opacity: 0; pointer-events: none;
+    transform: translateX(100%);
+    overflow: auto;
+  }
+  .slide.is-animating { transition: transform 0.6s cubic-bezier(.65,0,.2,1), opacity 0.5s ease; }
+  .slide.is-current { opacity: 1; pointer-events: auto; transform: translateX(0); z-index: 2; }
+  .slide.is-prev { transform: translateX(-100%); opacity: 1; }
+  .slide.is-next { transform: translateX(100%); opacity: 1; }
+
+  .bg-canvas { background: var(--canvas); color: var(--ink); }
+  .bg-card { background: var(--card); color: var(--ink); }
+  .bg-dark { background: var(--dark); color: var(--on-dark); }
+
+  .slide-inner { width: 100%; max-width: 1200px; margin: 0 auto; }
+  .two-col { display: grid; grid-template-columns: 1.05fr 1fr; gap: clamp(28px, 4vw, 60px); align-items: center; }
+
+  .label {
+    font-family: var(--font-sans); font-weight: 700;
+    font-size: clamp(13px, 1.2vw, 18px); letter-spacing: 0.1em;
+    text-transform: uppercase; color: var(--muted);
+    margin-bottom: 22px;
+  }
+  .bg-dark .label { color: var(--on-dark-soft); }
+
+  .display-xl {
+    font-family: var(--font-display); font-weight: 800;
+    font-size: clamp(38px, 4.8vw, 70px);
+    line-height: 1.12; letter-spacing: -0.02em;
+    margin-bottom: 20px;
+  }
+  .display-lg {
+    font-family: var(--font-display); font-weight: 800;
+    font-size: clamp(34px, 4vw, 58px);
+    line-height: 1.14; letter-spacing: -0.018em;
+    margin-bottom: 18px;
+  }
+  .display-md {
+    font-family: var(--font-display); font-weight: 800;
+    font-size: clamp(28px, 3vw, 44px);
+    line-height: 1.24; letter-spacing: -0.015em;
+    margin-bottom: 16px;
+  }
+  .subhead {
+    font-family: var(--font-sans); font-weight: 500;
+    font-size: clamp(17px, 1.7vw, 23px);
+    line-height: 1.55; letter-spacing: -0.008em;
+    color: var(--body); margin-bottom: 24px;
+  }
+  .bg-dark .subhead { color: var(--on-dark-soft); }
+
+  .body {
+    font-family: var(--font-sans); font-weight: 400;
+    font-size: clamp(16px, 1.55vw, 21px);
+    line-height: 1.75; letter-spacing: -0.003em;
+    color: var(--body);
+  }
+  .bg-dark .body { color: var(--on-dark-soft); }
+  .strong { font-weight: 600; color: var(--ink); }
+  .bg-dark .strong { color: var(--on-dark); }
+
+  .scripture {
+    margin-top: 24px;
+    padding-left: 20px;
+    border-left: 4px solid var(--primary);
+  }
+  .scripture .quote {
+    font-family: var(--font-display); font-weight: 700;
+    font-size: clamp(19px, 2vw, 27px);
+    line-height: 1.45; letter-spacing: -0.01em;
+  }
+  .scripture .cite {
+    margin-top: 10px;
+    font-family: var(--font-sans); font-weight: 700;
+    font-size: clamp(13px, 1.1vw, 16px); letter-spacing: 0.08em;
+    text-transform: uppercase; color: var(--muted);
+  }
+  .bg-dark .scripture .cite { color: var(--on-dark-soft); }
+
+  .key-pull {
+    font-family: var(--font-display); font-weight: 800;
+    font-size: clamp(30px, 3.6vw, 52px);
+    line-height: 1.24; letter-spacing: -0.018em;
+    margin-bottom: 24px;
+  }
+
+  .qline { display: grid; grid-template-columns: 64px 1fr; gap: 18px; padding: 16px 0; align-items: baseline; }
+  .qline + .qline { border-top: 1px solid var(--hairline); }
+  .bg-dark .qline + .qline { border-top: 1px solid rgba(255,255,255,0.08); }
+  .qnum {
+    font-family: var(--font-sans); font-weight: 700;
+    font-size: clamp(14px, 1.2vw, 18px); letter-spacing: 0.08em;
+    color: var(--primary);
+  }
+  .qtext {
+    font-family: var(--font-sans); font-weight: 500;
+    font-size: clamp(16px, 1.6vw, 21px); line-height: 1.6; letter-spacing: -0.003em;
+  }
+
+  .prayer-text {
+    font-family: var(--font-display); font-weight: 700;
+    font-size: clamp(22px, 2.4vw, 33px);
+    line-height: 1.52; letter-spacing: -0.015em;
+  }
+  .prayer-divider { width: 72px; height: 3px; background: var(--primary); margin: 30px 0 24px; }
+  .amen {
+    display: inline-block; margin-top: 20px;
+    font-family: var(--font-sans); font-weight: 700;
+    font-size: clamp(13px, 1.1vw, 16px); letter-spacing: 0.1em;
+    color: var(--muted);
+  }
+  .bg-dark .amen { color: var(--on-dark-soft); }
+
+  .day-illustration { width: 100%; max-width: 480px; aspect-ratio: 1 / 1; }
+  .day-illustration svg { width: 100%; height: 100%; display: block; }
+
+  .day-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 14px; margin-top: 32px; max-width: 1100px; }
+  .day-tile {
+    padding: 22px 18px; border-radius: 14px;
+    border: 1px solid var(--hairline); background: var(--canvas);
+    display: flex; flex-direction: column; gap: 8px; min-height: 200px;
+    transition: border-color 0.2s ease, transform 0.2s ease;
+    cursor: pointer;
+  }
+  .day-tile:hover { border-color: var(--primary); transform: translateY(-2px); }
+  .day-tile:focus-visible { outline: 2px solid var(--primary); outline-offset: 3px; }
+  .day-tile:active { transform: translateY(0); }
+  .day-tile .num { font-family: var(--font-sans); font-weight: 700; font-size: 13px; letter-spacing: 0.09em; text-transform: uppercase; color: var(--primary); }
+  .day-tile .scrip { font-family: var(--font-sans); font-weight: 700; font-size: 12px; letter-spacing: 0.07em; text-transform: uppercase; color: var(--muted); }
+  .day-tile .ttl { font-family: var(--font-display); font-weight: 800; font-size: 21px; line-height: 1.25; letter-spacing: -0.015em; margin-top: auto; }
+
+  .corner {
+    position: absolute; bottom: 20px; z-index: 5;
+    font-family: var(--font-sans); font-weight: 700;
+    font-size: 13px; letter-spacing: 0.09em; text-transform: uppercase;
+    color: var(--muted); pointer-events: none;
+  }
+  .bg-dark .corner { color: var(--on-dark-soft); }
+  .corner.left { left: clamp(28px, 5vw, 60px); }
+  .corner.right { right: clamp(28px, 5vw, 60px); font-variant-numeric: tabular-nums; }
+
+  .nav-zone { position: absolute; top: 0; bottom: 0; width: 18%; z-index: 30; cursor: pointer; }
+  .nav-zone.left { left: 0; }
+  .nav-zone.right { right: 0; }
+  .nav-zone .arrow {
+    position: absolute; top: 50%; transform: translateY(-50%);
+    width: 44px; height: 44px; border-radius: 8px;
+    background: rgba(20,20,19,0.06); color: var(--ink);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 18px; opacity: 0; transition: opacity 0.25s;
+  }
+  .nav-zone.left .arrow { left: 16px; }
+  .nav-zone.right .arrow { right: 16px; }
+  .nav-zone:hover .arrow { opacity: 1; }
+  .deck.dark-mode .nav-zone .arrow { background: rgba(255,255,255,0.12); color: var(--on-dark); }
+
+  .build { opacity: 0; transform: translateY(12px); transition: opacity 0.5s ease, transform 0.5s cubic-bezier(.2,.7,.3,1); }
+  .slide.is-current .build { opacity: 1; transform: translateY(0); }
+  .slide.is-current .build:nth-of-type(1) { transition-delay: 0.08s; }
+  .slide.is-current .build:nth-of-type(2) { transition-delay: 0.18s; }
+  .slide.is-current .build:nth-of-type(3) { transition-delay: 0.28s; }
+  .slide.is-current .build:nth-of-type(4) { transition-delay: 0.38s; }
+
+  @media (max-width: 833px) {
+    .stage { background: var(--canvas); }
+    .deck {
+      aspect-ratio: auto;
+      width: 100vw;
+      height: 100dvh;
+      max-height: 100dvh;
+    }
+    @supports not (height: 100dvh) {
+      .deck { height: 100vh; max-height: 100vh; }
+    }
+    .slide {
+      padding: 56px 20px calc(72px + env(safe-area-inset-bottom));
+      align-items: flex-start;
+    }
+    .two-col { grid-template-columns: 1fr; gap: 22px; align-items: start; }
+    .day-illustration { max-width: 160px; margin: 8px auto 0; order: 2; }
+    .day-grid {
+      grid-template-columns: 1fr;
+      gap: 10px; margin-top: 22px; max-width: 100%;
+    }
+    .day-tile {
+      min-height: auto;
+      flex-direction: row; align-items: center; gap: 12px;
+      padding: 16px 18px;
+    }
+    .day-tile .ttl { margin-top: 0; font-size: 17px; flex: 1; }
+    .day-tile .num, .day-tile .scrip { font-size: 10px; white-space: nowrap; }
+
+    .corner {
+      font-size: 11px;
+      bottom: calc(18px + env(safe-area-inset-bottom));
+      letter-spacing: 0.06em;
+    }
+    .corner.left { left: 16px; max-width: 60%; }
+    .corner.right { right: 16px; }
+
+    .nav-zone { width: 14%; }
+    .nav-zone .arrow { width: 36px; height: 36px; font-size: 16px; }
+
+    .display-xl { font-size: clamp(32px, 8vw, 50px); }
+    .display-lg { font-size: clamp(28px, 7.5vw, 44px); }
+    .display-md { font-size: clamp(24px, 6.5vw, 36px); }
+    .key-pull { font-size: clamp(24px, 6.5vw, 34px); }
+    .subhead { font-size: clamp(15px, 4vw, 19px); }
+    .body { font-size: clamp(14px, 3.8vw, 17px); }
+    .scripture .quote { font-size: clamp(16px, 4.2vw, 21px); }
+    .scripture .cite { font-size: clamp(11px, 3vw, 14px); }
+    .qtext { font-size: clamp(14px, 3.8vw, 18px); }
+    .qnum { font-size: clamp(12px, 3.2vw, 15px); }
+    .prayer-text { font-size: clamp(18px, 5vw, 24px); }
+    .label { font-size: clamp(11px, 3vw, 14px); }
+  }
+  @media (max-width: 833px) and (orientation: landscape) {
+    .slide { padding: 24px 32px 40px; }
+    .two-col { grid-template-columns: 1.1fr 1fr; gap: 18px; }
+    .day-illustration { max-width: 200px; order: 0; }
+  }
+</style>
+</head>
+<body>
+
+<svg width="0" height="0" style="position: absolute;">
+  <defs>
+    <!-- Day 1: Different shapes converging toward a central cross (diversity united only in Christ) -->
+    <symbol id="day1-svg" viewBox="0 0 1024 1024">
+      <line x1="512" y1="380" x2="512" y2="644" stroke="#cc785c" stroke-width="6" stroke-linecap="round"/>
+      <line x1="420" y1="472" x2="604" y2="472" stroke="#cc785c" stroke-width="6" stroke-linecap="round"/>
+      <circle cx="260" cy="300" r="26" stroke="#cc785c" stroke-width="5" fill="none"/>
+      <rect x="712" y="270" width="52" height="52" stroke="#cc785c" stroke-width="5" fill="none" transform="rotate(10 738 296)"/>
+      <polygon points="256,760 296,830 216,830" stroke="#cc785c" stroke-width="5" fill="none"/>
+      <rect x="700" y="720" width="60" height="60" rx="14" stroke="#cc785c" stroke-width="5" fill="none"/>
+      <line x1="286" y1="320" x2="470" y2="450" stroke="#cc785c" stroke-width="3" opacity="0.5" stroke-linecap="round"/>
+      <line x1="712" y1="310" x2="560" y2="450" stroke="#cc785c" stroke-width="3" opacity="0.5" stroke-linecap="round"/>
+      <line x1="270" y1="770" x2="470" y2="520" stroke="#cc785c" stroke-width="3" opacity="0.5" stroke-linecap="round"/>
+      <line x1="720" y1="750" x2="560" y2="520" stroke="#cc785c" stroke-width="3" opacity="0.5" stroke-linecap="round"/>
+    </symbol>
+    <!-- Day 2: One path splitting into two from the same starting point (same gospel, different choices) -->
+    <symbol id="day2-svg" viewBox="0 0 1024 1024">
+      <circle cx="512" cy="230" r="18" fill="#cc785c"/>
+      <path d="M512 248 L512 400" stroke="#cc785c" stroke-width="5" stroke-linecap="round"/>
+      <path d="M512 400 Q400 520 320 760" stroke="#cc785c" stroke-width="5" fill="none" stroke-linecap="round"/>
+      <path d="M512 400 Q624 520 704 760" stroke="#cc785c" stroke-width="5" fill="none" stroke-linecap="round"/>
+      <circle cx="320" cy="784" r="16" fill="#cc785c" opacity="0.5"/>
+      <line x1="704" y1="720" x2="704" y2="820" stroke="#cc785c" stroke-width="5" stroke-linecap="round"/>
+      <line x1="668" y1="750" x2="740" y2="750" stroke="#cc785c" stroke-width="5" stroke-linecap="round"/>
+    </symbol>
+    <!-- Day 3: Light descending into an empty bowl (fasting and worship, emptiness and filling) -->
+    <symbol id="day3-svg" viewBox="0 0 1024 1024">
+      <path d="M320 560 Q512 700 704 560" stroke="#cc785c" stroke-width="5" fill="none" stroke-linecap="round"/>
+      <path d="M300 560 L320 560" stroke="#cc785c" stroke-width="5" stroke-linecap="round"/>
+      <path d="M704 560 L724 560" stroke="#cc785c" stroke-width="5" stroke-linecap="round"/>
+      <line x1="512" y1="220" x2="512" y2="340" stroke="#cc785c" stroke-width="4" stroke-linecap="round"/>
+      <line x1="420" y1="260" x2="470" y2="360" stroke="#cc785c" stroke-width="3" opacity="0.6" stroke-linecap="round"/>
+      <line x1="604" y1="260" x2="554" y2="360" stroke="#cc785c" stroke-width="3" opacity="0.6" stroke-linecap="round"/>
+      <circle cx="512" cy="440" r="8" fill="#cc785c" opacity="0.7"/>
+    </symbol>
+    <!-- Day 4: Hands laid in blessing, then a path sending someone out (commissioning) -->
+    <symbol id="day4-svg" viewBox="0 0 1024 1024">
+      <path d="M330 380 Q460 460 512 460 Q564 460 694 380" stroke="#cc785c" stroke-width="5" fill="none" stroke-linecap="round"/>
+      <line x1="512" y1="460" x2="512" y2="560" stroke="#cc785c" stroke-width="5" stroke-linecap="round"/>
+      <circle cx="512" cy="600" r="18" fill="#cc785c"/>
+      <path d="M512 618 Q512 700 680 780" stroke="#cc785c" stroke-width="5" fill="none" stroke-linecap="round"/>
+      <path d="M660 760 L690 784 L654 800" stroke="#cc785c" stroke-width="5" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+    </symbol>
+    <!-- Day 5: People scattering outward from a road in every direction (a church that sends) -->
+    <symbol id="day5-svg" viewBox="0 0 1024 1024">
+      <path d="M180 700 Q512 560 844 700" stroke="#cc785c" stroke-width="5" fill="none" stroke-linecap="round"/>
+      <path d="M512 560 L512 300" stroke="#cc785c" stroke-width="3" opacity="0.4" stroke-dasharray="4 14" stroke-linecap="round"/>
+      <path d="M512 560 L260 260" stroke="#cc785c" stroke-width="3" opacity="0.4" stroke-dasharray="4 14" stroke-linecap="round"/>
+      <path d="M512 560 L764 260" stroke="#cc785c" stroke-width="3" opacity="0.4" stroke-dasharray="4 14" stroke-linecap="round"/>
+      <circle cx="512" cy="300" r="14" fill="#cc785c"/>
+      <circle cx="260" cy="260" r="14" fill="#cc785c" opacity="0.75"/>
+      <circle cx="764" cy="260" r="14" fill="#cc785c" opacity="0.85"/>
+      <circle cx="512" cy="560" r="20" fill="#cc785c"/>
+    </symbol>
+  </defs>
+</svg>
+
+<div class="stage">
+  <div class="deck" id="deck">
+    <div class="corner left">Built on the Road · 5-Day Devotional</div>
+    <div class="corner right"><span id="curIdx">1</span> / <span id="totIdx">16</span></div>
+    <div class="nav-zone left" id="navLeft"><div class="arrow">←</div></div>
+    <div class="nav-zone right" id="navRight"><div class="arrow">→</div></div>
+
+    <div class="reel" id="reel">
+
+      <!-- 1. Series Intro -->
+      <section class="slide bg-canvas" data-bg="light">
+        <div class="slide-inner">
+          <div class="label build">Acts 13 · The Church at Antioch</div>
+          <h1 class="display-lg build">The only thing that unites<br/>our differences is Christ.</h1>
+          <p class="body build" style="margin-top: 8px;">
+            One reading a day — a single verse, a key truth, a short meditation, and a prayer. Five days to walk together through the week.
+          </p>
+          <div class="day-grid build">
+            <div class="day-tile" data-goto="1" role="button" tabindex="0"><span class="num">DAY 01</span><span class="scrip">Acts 13:1</span><span class="ttl">Unity Beyond Diversity.</span></div>
+            <div class="day-tile" data-goto="4" role="button" tabindex="0"><span class="num">DAY 02</span><span class="scrip">Acts 11:26</span><span class="ttl">The Name Christian.</span></div>
+            <div class="day-tile" data-goto="7" role="button" tabindex="0"><span class="num">DAY 03</span><span class="scrip">Acts 13:2</span><span class="ttl">Fasting as Worship.</span></div>
+            <div class="day-tile" data-goto="10" role="button" tabindex="0"><span class="num">DAY 04</span><span class="scrip">Acts 13:3</span><span class="ttl">Giving Our Presence.</span></div>
+            <div class="day-tile" data-goto="13" role="button" tabindex="0"><span class="num">DAY 05</span><span class="scrip">Acts 13:1-3</span><span class="ttl">A Church That Sends.</span></div>
+          </div>
+        </div>
+      </section>
+
+      <!-- DAY 1 -->
+      <section class="slide bg-canvas" data-bg="light">
+        <div class="slide-inner two-col">
+          <div>
+            <div class="label build">DAY 01 · Unity Beyond Diversity</div>
+            <h2 class="display-xl build">Gathering people together<br/>does not, by itself,<br/>make them one.</h2>
+            <p class="subhead build">Different backgrounds, different colors, different cultures — how did they become one church?</p>
+            <div class="scripture build">
+              <p class="quote">"Now there were in the church at Antioch prophets and teachers, Barnabas, Simeon who was called Niger, Lucius of Cyrene, Manaen a lifelong friend of Herod the tetrarch, and Saul."</p>
+              <p class="cite">Acts 13:1 · ESV</p>
+            </div>
+          </div>
+          <div class="day-illustration build"><svg><use href="#day1-svg"/></svg></div>
+        </div>
+      </section>
+      <section class="slide bg-canvas" data-bg="light">
+        <div class="slide-inner">
+          <div class="label build">DAY 01 · Meditation</div>
+          <h3 class="key-pull build">What united the church at Antioch<br/>was not what they had in common — it was Christ.</h3>
+          <p class="body build" style="margin-top: 18px;">
+            Barnabas from Cyprus, Simeon and Lucius from North Africa, Manaen who grew up beside King Herod himself, and Saul. Five leaders, each from a completely different race, background, and social standing.
+          </p>
+          <p class="body build" style="margin-top: 14px;">
+            Simply gathering people in one place does not make them one — if anything, it makes it easier to divide and draw harder lines. <span class="strong">The one thing these five leaders held in common was Jesus Christ, and Christ alone.</span>
+          </p>
+        </div>
+      </section>
+      <section class="slide bg-card" data-bg="light">
+        <div class="slide-inner">
+          <div class="label build">DAY 01 · Reflect + Pray</div>
+          <h3 class="display-md build">Begin today by thinking of someone different from you.</h3>
+          <div class="qline build">
+            <span class="qnum">01</span>
+            <span class="qtext">When you meet someone whose background and temperament differ from yours, what do you notice first?</span>
+          </div>
+          <div class="qline build">
+            <span class="qnum">02</span>
+            <span class="qtext">What is the one thing that could make you and that person truly one?</span>
+          </div>
+          <div class="prayer-divider build"></div>
+          <p class="prayer-text build">
+            Lord,<br/>
+            keep me from drawing lines before those who differ from me.<br/>Teach me what it means to be one in Christ alone.
+          </p>
+          <span class="amen build">— Amen.</span>
+        </div>
+      </section>
+
+      <!-- DAY 2 -->
+      <section class="slide bg-canvas" data-bg="light">
+        <div class="slide-inner two-col">
+          <div>
+            <div class="label build">DAY 02 · The Name "Christian"</div>
+            <h2 class="display-xl build">A people who cannot<br/>be explained<br/>apart from Christ.</h2>
+            <p class="subhead build">It may have begun as mockery, but the world had no other word for them.</p>
+            <div class="scripture build">
+              <p class="quote">"...and in Antioch the disciples were first called Christians."</p>
+              <p class="cite">Acts 11:26 · ESV</p>
+            </div>
+          </div>
+          <div class="day-illustration build"><svg><use href="#day2-svg"/></svg></div>
+        </div>
+      </section>
+      <section class="slide bg-canvas" data-bg="light">
+        <div class="slide-inner">
+          <div class="label build">DAY 02 · Meditation</div>
+          <h3 class="key-pull build">The same gospel is heard<br/>by two people — and still, they choose differently.</h3>
+          <p class="body build" style="margin-top: 18px;">
+            Herod Antipas and Manaen were raised together from childhood, nursed at the same breast, closest of friends. Both saw Jesus. Both heard the same gospel. Yet one conspired to kill him, and the other believed and gave his whole life to the very Jesus his friend had killed.
+          </p>
+          <p class="body build" style="margin-top: 14px;">
+            The name "Christian" was never a matter of pedigree or achievement — it belongs only to those who have given their lives to Christ. <span class="strong">When what we know and how we live become one, the world has no choice but to call us by that name.</span>
+          </p>
+        </div>
+      </section>
+      <section class="slide bg-card" data-bg="light">
+        <div class="slide-inner">
+          <div class="label build">DAY 02 · Reflect + Pray</div>
+          <h3 class="display-md build">Ask honestly whether your name matches your life.</h3>
+          <div class="qline build">
+            <span class="qnum">01</span>
+            <span class="qtext">Am I living up to the name "Christian"?</span>
+          </div>
+          <div class="qline build">
+            <span class="qnum">02</span>
+            <span class="qtext">Have there been moments when I responded like Manaen — or like Herod — to the very same word?</span>
+          </div>
+          <div class="prayer-divider build"></div>
+          <p class="prayer-text build">
+            Lord,<br/>
+            I want my life to be inexplicable apart from you.<br/>Make what I know and how I live one and the same.
+          </p>
+          <span class="amen build">— Amen.</span>
+        </div>
+      </section>
+
+      <!-- DAY 3 -->
+      <section class="slide bg-dark" data-bg="dark">
+        <div class="slide-inner two-col">
+          <div>
+            <div class="label build">DAY 03 · Fasting as Everyday Worship</div>
+            <h2 class="display-xl build">Fasting was not<br/>a special occasion —<br/>it was their everyday worship.</h2>
+            <p class="subhead build">Even while the church was thriving, its leaders kept fasting and depending on God.</p>
+            <div class="scripture build">
+              <p class="quote">"While they were worshiping the Lord and fasting, the Holy Spirit said, 'Set apart for me Barnabas and Saul for the work to which I have called them.'"</p>
+              <p class="cite">Acts 13:2 · ESV</p>
+            </div>
+          </div>
+          <div class="day-illustration build"><svg><use href="#day3-svg"/></svg></div>
+        </div>
+      </section>
+      <section class="slide bg-canvas" data-bg="light">
+        <div class="slide-inner">
+          <div class="label build">DAY 03 · Meditation</div>
+          <h3 class="key-pull build">To fast is to cut off<br/>our own desires and our own sin.</h3>
+          <p class="body build" style="margin-top: 18px;">
+            Antioch was, by any measure, a thriving, sought-after church. Nothing was wrong. And yet its leaders fasted anyway. The original language places worship and fasting side by side, as one and the same act — <span class="strong">"worshiping the Lord and fasting."</span>
+          </p>
+          <p class="body build" style="margin-top: 14px;">
+            They humbly emptied their hearts before God, and the Holy Spirit himself filled that emptiness. Depending on God even when nothing is wrong — that is true worship.
+          </p>
+        </div>
+      </section>
+      <section class="slide bg-card" data-bg="light">
+        <div class="slide-inner">
+          <div class="label build">DAY 03 · Reflect + Pray</div>
+          <h3 class="display-md build">Seek an empty heart even when life is going well.</h3>
+          <div class="qline build">
+            <span class="qnum">01</span>
+            <span class="qtext">Do I depend on God even when everything seems fine?</span>
+          </div>
+          <div class="qline build">
+            <span class="qnum">02</span>
+            <span class="qtext">What one desire or sin do I need to cut off today?</span>
+          </div>
+          <div class="prayer-divider build"></div>
+          <p class="prayer-text build">
+            Lord,<br/>
+            even when life is going well, keep me from relying on my own strength.<br/>I come with an empty heart, asking to be filled by your Spirit.
+          </p>
+          <span class="amen build">— Amen.</span>
+        </div>
+      </section>
+
+      <!-- DAY 4 -->
+      <section class="slide bg-canvas" data-bg="light">
+        <div class="slide-inner two-col">
+          <div>
+            <div class="label build">DAY 04 · Giving Our Presence</div>
+            <h2 class="display-xl build">Mission begins<br/>with giving away<br/>our presence.</h2>
+            <p class="subhead build">Mission is not only about sending missionaries overseas.</p>
+            <div class="scripture build">
+              <p class="quote">"Then after fasting and praying they laid their hands on them and sent them off."</p>
+              <p class="cite">Acts 13:3 · ESV</p>
+            </div>
+          </div>
+          <div class="day-illustration build"><svg><use href="#day4-svg"/></svg></div>
+        </div>
+      </section>
+      <section class="slide bg-canvas" data-bg="light">
+        <div class="slide-inner">
+          <div class="label build">DAY 04 · Meditation</div>
+          <h3 class="key-pull build">Before we go and gather people in,<br/>we must first become a sending people.</h3>
+          <p class="body build" style="margin-top: 18px;">
+            Letting go of Barnabas and Saul must have been a fearful, painful decision for the leaders of Antioch. It could easily have slowed their own growth. Still, they obeyed the voice of the Spirit.
+          </p>
+          <p class="body build" style="margin-top: 14px;">
+            Mission means giving our very presence to the place where we live, welcoming everyone in the name of the Lord. <span class="strong">Every time believers step into their homes, workplaces, and schools, that place becomes a mission field.</span>
+          </p>
+        </div>
+      </section>
+      <section class="slide bg-card" data-bg="light">
+        <div class="slide-inner">
+          <div class="label build">DAY 04 · Reflect + Pray</div>
+          <h3 class="display-md build">See where you are today as your mission field.</h3>
+          <div class="qline build">
+            <span class="qnum">01</span>
+            <span class="qtext">Which of your home, workplace, or school is your mission field today?</span>
+          </div>
+          <div class="qline build">
+            <span class="qnum">02</span>
+            <span class="qtext">Is there something you have been holding onto that God may be asking you to release?</span>
+          </div>
+          <div class="prayer-divider build"></div>
+          <p class="prayer-text build">
+            Lord,<br/>
+            help me see where I stand today as a mission field.<br/>Give me the faith to let go and give freely, rather than hold on.
+          </p>
+          <span class="amen build">— Amen.</span>
+        </div>
+      </section>
+
+      <!-- DAY 5 -->
+      <section class="slide bg-canvas" data-bg="light">
+        <div class="slide-inner two-col">
+          <div>
+            <div class="label build">DAY 05 · A Church That Sends</div>
+            <h2 class="display-xl build">Not a church<br/>that gathers people in,<br/>but one that sends them out.</h2>
+            <p class="subhead build">Not a church that builds ever higher, but one that flows ever further.</p>
+            <div class="scripture build">
+              <p class="quote">"...While they were worshiping the Lord and fasting... Then after fasting and praying they laid their hands on them and sent them off."</p>
+              <p class="cite">Acts 13:1-3 · ESV</p>
+            </div>
+          </div>
+          <div class="day-illustration build"><svg><use href="#day5-svg"/></svg></div>
+        </div>
+      </section>
+      <section class="slide bg-canvas" data-bg="light">
+        <div class="slide-inner">
+          <div class="label build">DAY 05 · Meditation</div>
+          <h3 class="key-pull build">Not a church that raises<br/>higher walls, but one that opens a road.</h3>
+          <p class="body build" style="margin-top: 18px;">
+            Refusing to hold on to the people God had given them as their own possession, and releasing them back into God's larger purposes — <span class="strong">that is the picture of a missional church that Antioch left us.</span>
+          </p>
+          <p class="body build" style="margin-top: 14px;">
+            A healthy church is not measured only by numbers. It is measured by how well it raises, trains, and sends its people — and by the fact that wherever they go, God's kingdom work begins again.
+          </p>
+        </div>
+      </section>
+      <section class="slide bg-dark" data-bg="dark">
+        <div class="slide-inner">
+          <div class="label build">Closing Prayer</div>
+          <h3 class="display-md build">This week,<br/>live as one built on the road.</h3>
+          <div class="qline build">
+            <span class="qnum">01</span>
+            <span class="qtext">This week, who or what do you need to release rather than hold on to?</span>
+          </div>
+          <div class="qline build">
+            <span class="qnum">02</span>
+            <span class="qtext">What single sentence from this week's devotional will you carry into your daily life?</span>
+          </div>
+          <div class="prayer-divider build"></div>
+          <p class="prayer-text build">
+            Lord,<br/>
+            let our church not be a fortress with high walls,<br/>but a road on which anyone may find rest in you.
+          </p>
+          <span class="amen build">— Amen.</span>
+        </div>
+      </section>
+
+    </div>
+  </div>
+</div>
+
+<script>
+  const deck = document.getElementById("deck");
+  const slides = Array.from(document.querySelectorAll(".slide"));
+  const total = slides.length;
+  const curEl = document.getElementById("curIdx");
+  const totEl = document.getElementById("totIdx");
+  totEl.textContent = total;
+  let cur = 0;
+  function applyMode() {
+    const isDark = (slides[cur].dataset.bg || "light") === "dark";
+    deck.classList.toggle("dark-mode", isDark);
+  }
+  function snapPositions(activeIdx) {
+    slides.forEach((s, i) => {
+      s.classList.remove("is-current", "is-prev", "is-next", "is-animating");
+      if (i === activeIdx) s.classList.add("is-current");
+      else if (i < activeIdx) s.classList.add("is-prev");
+      else s.classList.add("is-next");
+    });
+  }
+  function go(idx, push = true) {
+    idx = Math.max(0, Math.min(total - 1, idx));
+    if (idx === cur && slides[cur].classList.contains("is-current")) return;
+    const dir = idx >= cur ? "fwd" : "back";
+    const oldCur = cur;
+    slides.forEach((s, i) => {
+      if (i === oldCur || i === idx) return;
+      s.classList.remove("is-current", "is-prev", "is-next", "is-animating");
+      if (i < idx) s.classList.add("is-prev");
+      else s.classList.add("is-next");
+    });
+    const out = slides[oldCur], inc = slides[idx];
+    out.classList.add("is-animating"); inc.classList.add("is-animating");
+    requestAnimationFrame(() => {
+      out.classList.remove("is-current");
+      out.classList.add(dir === "fwd" ? "is-prev" : "is-next");
+      inc.classList.remove("is-prev", "is-next");
+      inc.classList.add("is-current");
+    });
+    cur = idx;
+    curEl.textContent = cur + 1;
+    applyMode();
+    if (push) history.replaceState(null, "", `#${cur + 1}`);
+  }
+  const initialHash = parseInt(location.hash.replace("#", ""), 10);
+  const startIdx = Number.isFinite(initialHash) && initialHash >= 1 ? Math.min(initialHash - 1, total - 1) : 0;
+  cur = startIdx;
+  snapPositions(startIdx);
+  curEl.textContent = cur + 1;
+  applyMode();
+  function next() { go(cur + 1); }
+  function prev() { go(cur - 1); }
+  document.addEventListener("keydown", (e) => {
+    switch (e.key) {
+      case "ArrowRight": case " ": case "PageDown": e.preventDefault(); next(); break;
+      case "ArrowLeft": case "PageUp": e.preventDefault(); prev(); break;
+      case "Home": e.preventDefault(); go(0); break;
+      case "End": e.preventDefault(); go(total - 1); break;
+      case "f": case "F":
+        if (!document.fullscreenElement) document.documentElement.requestFullscreen?.();
+        else document.exitFullscreen?.();
+        break;
+    }
+  });
+  document.getElementById("navLeft").addEventListener("click", prev);
+  document.getElementById("navRight").addEventListener("click", next);
+  document.querySelectorAll(".day-tile[data-goto]").forEach(tile => {
+    const handler = (e) => {
+      e.preventDefault();
+      go(parseInt(tile.dataset.goto, 10));
+    };
+    tile.addEventListener("click", handler);
+    tile.addEventListener("keydown", (e) => {
+      if (e.key === "Enter" || e.key === " ") handler(e);
+    });
+  });
+  let tx = null;
+  deck.addEventListener("touchstart", (e) => { tx = e.touches[0].clientX; }, { passive: true });
+  deck.addEventListener("touchend", (e) => {
+    if (tx === null) return;
+    const dx = e.changedTouches[0].clientX - tx;
+    if (Math.abs(dx) > 60) (dx < 0 ? next : prev)();
+    tx = null;
+  });
+</script>
+</body>
+</html>
