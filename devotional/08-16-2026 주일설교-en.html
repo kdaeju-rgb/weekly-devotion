@@ -1,0 +1,680 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>5-Day Devotional — Dead End, New Beginning (Acts 16:6-15)</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --primary: #cc785c;
+    --canvas: #faf9f5;
+    --card: #efe9de;
+    --dark: #181715;
+    --ink: #141413;
+    --body: #3d3d3a;
+    --muted: #6c6a64;
+    --on-dark: #faf9f5;
+    --on-dark-soft: #a09d96;
+    --hairline: #e6dfd8;
+    --font-display: "Playfair Display", Georgia, serif;
+    --font-sans: "Inter", -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body { height: 100%; overflow: hidden; font-family: var(--font-sans); background: #1a1a1a; -webkit-font-smoothing: antialiased; }
+
+  .stage {
+    position: fixed; inset: 0;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .deck {
+    position: relative;
+    aspect-ratio: 16 / 9;
+    width: 100vw; height: auto;
+    max-height: 100vh;
+    background: var(--canvas);
+    overflow: hidden;
+  }
+  @supports not (aspect-ratio: 16 / 9) {
+    .deck { width: 100vw; height: 56.25vw; }
+  }
+
+  .reel { position: relative; width: 100%; height: 100%; perspective: 1800px; transform-style: preserve-3d; }
+  .slide {
+    position: absolute; inset: 0;
+    display: flex; align-items: center;
+    padding: clamp(28px, 4.5vh, 60px) clamp(36px, 5.5vw, 90px);
+    opacity: 0; pointer-events: none;
+    transform: translateX(100%);
+    overflow: auto;
+  }
+  .slide.is-animating { transition: transform 0.6s cubic-bezier(.65,0,.2,1), opacity 0.5s ease; }
+  .slide.is-current { opacity: 1; pointer-events: auto; transform: translateX(0); z-index: 2; }
+  .slide.is-prev { transform: translateX(-100%); opacity: 1; }
+  .slide.is-next { transform: translateX(100%); opacity: 1; }
+
+  .bg-canvas { background: var(--canvas); color: var(--ink); }
+  .bg-card { background: var(--card); color: var(--ink); }
+  .bg-dark { background: var(--dark); color: var(--on-dark); }
+
+  .slide-inner { width: 100%; max-width: 1200px; margin: 0 auto; }
+  .two-col { display: grid; grid-template-columns: 1.05fr 1fr; gap: clamp(28px, 4vw, 60px); align-items: center; }
+
+  .label {
+    font-family: var(--font-sans); font-weight: 700;
+    font-size: clamp(13px, 1.2vw, 18px); letter-spacing: 0.1em;
+    text-transform: uppercase; color: var(--muted);
+    margin-bottom: 22px;
+  }
+  .bg-dark .label { color: var(--on-dark-soft); }
+
+  .display-xl {
+    font-family: var(--font-display); font-weight: 800;
+    font-size: clamp(38px, 4.8vw, 70px);
+    line-height: 1.12; letter-spacing: -0.02em;
+    margin-bottom: 20px;
+  }
+  .display-lg {
+    font-family: var(--font-display); font-weight: 800;
+    font-size: clamp(34px, 4vw, 58px);
+    line-height: 1.14; letter-spacing: -0.018em;
+    margin-bottom: 18px;
+  }
+  .display-md {
+    font-family: var(--font-display); font-weight: 800;
+    font-size: clamp(28px, 3vw, 44px);
+    line-height: 1.24; letter-spacing: -0.015em;
+    margin-bottom: 16px;
+  }
+  .subhead {
+    font-family: var(--font-sans); font-weight: 500;
+    font-size: clamp(17px, 1.7vw, 23px);
+    line-height: 1.55; letter-spacing: -0.008em;
+    color: var(--body); margin-bottom: 24px;
+  }
+  .bg-dark .subhead { color: var(--on-dark-soft); }
+
+  .body {
+    font-family: var(--font-sans); font-weight: 400;
+    font-size: clamp(16px, 1.55vw, 21px);
+    line-height: 1.75; letter-spacing: -0.003em;
+    color: var(--body);
+  }
+  .bg-dark .body { color: var(--on-dark-soft); }
+  .strong { font-weight: 600; color: var(--ink); }
+  .bg-dark .strong { color: var(--on-dark); }
+
+  .scripture {
+    margin-top: 24px;
+    padding-left: 20px;
+    border-left: 4px solid var(--primary);
+  }
+  .scripture .quote {
+    font-family: var(--font-display); font-weight: 700;
+    font-size: clamp(19px, 2vw, 27px);
+    line-height: 1.45; letter-spacing: -0.01em;
+  }
+  .scripture .cite {
+    margin-top: 10px;
+    font-family: var(--font-sans); font-weight: 700;
+    font-size: clamp(13px, 1.1vw, 16px); letter-spacing: 0.08em;
+    text-transform: uppercase; color: var(--muted);
+  }
+  .bg-dark .scripture .cite { color: var(--on-dark-soft); }
+
+  .key-pull {
+    font-family: var(--font-display); font-weight: 800;
+    font-size: clamp(30px, 3.6vw, 52px);
+    line-height: 1.24; letter-spacing: -0.018em;
+    margin-bottom: 24px;
+  }
+
+  .qline { display: grid; grid-template-columns: 64px 1fr; gap: 18px; padding: 16px 0; align-items: baseline; }
+  .qline + .qline { border-top: 1px solid var(--hairline); }
+  .bg-dark .qline + .qline { border-top: 1px solid rgba(255,255,255,0.08); }
+  .qnum {
+    font-family: var(--font-sans); font-weight: 700;
+    font-size: clamp(14px, 1.2vw, 18px); letter-spacing: 0.08em;
+    color: var(--primary);
+  }
+  .qtext {
+    font-family: var(--font-sans); font-weight: 500;
+    font-size: clamp(16px, 1.6vw, 21px); line-height: 1.6; letter-spacing: -0.003em;
+  }
+
+  .prayer-text {
+    font-family: var(--font-display); font-weight: 700;
+    font-size: clamp(22px, 2.4vw, 33px);
+    line-height: 1.52; letter-spacing: -0.015em;
+  }
+  .prayer-divider { width: 72px; height: 3px; background: var(--primary); margin: 30px 0 24px; }
+  .amen {
+    display: inline-block; margin-top: 20px;
+    font-family: var(--font-sans); font-weight: 700;
+    font-size: clamp(13px, 1.1vw, 16px); letter-spacing: 0.1em;
+    color: var(--muted);
+  }
+  .bg-dark .amen { color: var(--on-dark-soft); }
+
+  .day-illustration { width: 100%; max-width: 480px; aspect-ratio: 1 / 1; }
+  .day-illustration svg { width: 100%; height: 100%; display: block; }
+
+  .day-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 14px; margin-top: 32px; max-width: 1100px; }
+  .day-tile {
+    padding: 22px 18px; border-radius: 14px;
+    border: 1px solid var(--hairline); background: var(--canvas);
+    display: flex; flex-direction: column; gap: 8px; min-height: 200px;
+    transition: border-color 0.2s ease, transform 0.2s ease;
+    cursor: pointer;
+  }
+  .day-tile:hover { border-color: var(--primary); transform: translateY(-2px); }
+  .day-tile:focus-visible { outline: 2px solid var(--primary); outline-offset: 3px; }
+  .day-tile:active { transform: translateY(0); }
+  .day-tile .num { font-family: var(--font-sans); font-weight: 700; font-size: 13px; letter-spacing: 0.09em; text-transform: uppercase; color: var(--primary); }
+  .day-tile .scrip { font-family: var(--font-sans); font-weight: 700; font-size: 12px; letter-spacing: 0.07em; text-transform: uppercase; color: var(--muted); }
+  .day-tile .ttl { font-family: var(--font-display); font-weight: 800; font-size: 21px; line-height: 1.25; letter-spacing: -0.015em; margin-top: auto; }
+
+  .corner {
+    position: absolute; bottom: 20px; z-index: 5;
+    font-family: var(--font-sans); font-weight: 700;
+    font-size: 13px; letter-spacing: 0.09em; text-transform: uppercase;
+    color: var(--muted); pointer-events: none;
+  }
+  .bg-dark .corner { color: var(--on-dark-soft); }
+  .corner.left { left: clamp(28px, 5vw, 60px); }
+  .corner.right { right: clamp(28px, 5vw, 60px); font-variant-numeric: tabular-nums; }
+
+  .nav-zone { position: absolute; top: 0; bottom: 0; width: 18%; z-index: 30; cursor: pointer; }
+  .nav-zone.left { left: 0; }
+  .nav-zone.right { right: 0; }
+  .nav-zone .arrow {
+    position: absolute; top: 50%; transform: translateY(-50%);
+    width: 44px; height: 44px; border-radius: 8px;
+    background: rgba(20,20,19,0.06); color: var(--ink);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 18px; opacity: 0; transition: opacity 0.25s;
+  }
+  .nav-zone.left .arrow { left: 16px; }
+  .nav-zone.right .arrow { right: 16px; }
+  .nav-zone:hover .arrow { opacity: 1; }
+  .deck.dark-mode .nav-zone .arrow { background: rgba(255,255,255,0.12); color: var(--on-dark); }
+
+  .build { opacity: 0; transform: translateY(12px); transition: opacity 0.5s ease, transform 0.5s cubic-bezier(.2,.7,.3,1); }
+  .slide.is-current .build { opacity: 1; transform: translateY(0); }
+  .slide.is-current .build:nth-of-type(1) { transition-delay: 0.08s; }
+  .slide.is-current .build:nth-of-type(2) { transition-delay: 0.18s; }
+  .slide.is-current .build:nth-of-type(3) { transition-delay: 0.28s; }
+  .slide.is-current .build:nth-of-type(4) { transition-delay: 0.38s; }
+
+  @media (max-width: 833px) {
+    .stage { background: var(--canvas); }
+    .deck {
+      aspect-ratio: auto;
+      width: 100vw;
+      height: 100dvh;
+      max-height: 100dvh;
+    }
+    @supports not (height: 100dvh) {
+      .deck { height: 100vh; max-height: 100vh; }
+    }
+    .slide {
+      padding: 56px 20px calc(72px + env(safe-area-inset-bottom));
+      align-items: flex-start;
+    }
+    .two-col { grid-template-columns: 1fr; gap: 22px; align-items: start; }
+    .day-illustration { max-width: 160px; margin: 8px auto 0; order: 2; }
+    .day-grid {
+      grid-template-columns: 1fr;
+      gap: 10px; margin-top: 22px; max-width: 100%;
+    }
+    .day-tile {
+      min-height: auto;
+      flex-direction: row; align-items: center; gap: 12px;
+      padding: 16px 18px;
+    }
+    .day-tile .ttl { margin-top: 0; font-size: 17px; flex: 1; }
+    .day-tile .num, .day-tile .scrip { font-size: 10px; white-space: nowrap; }
+
+    .corner {
+      font-size: 11px;
+      bottom: calc(18px + env(safe-area-inset-bottom));
+      letter-spacing: 0.06em;
+    }
+    .corner.left { left: 16px; max-width: 60%; }
+    .corner.right { right: 16px; }
+
+    .nav-zone { width: 14%; }
+    .nav-zone .arrow { width: 36px; height: 36px; font-size: 16px; }
+
+    .display-xl { font-size: clamp(32px, 8vw, 50px); }
+    .display-lg { font-size: clamp(28px, 7.5vw, 44px); }
+    .display-md { font-size: clamp(24px, 6.5vw, 36px); }
+    .key-pull { font-size: clamp(24px, 6.5vw, 34px); }
+    .subhead { font-size: clamp(15px, 4vw, 19px); }
+    .body { font-size: clamp(14px, 3.8vw, 17px); }
+    .scripture .quote { font-size: clamp(16px, 4.2vw, 21px); }
+    .scripture .cite { font-size: clamp(11px, 3vw, 14px); }
+    .qtext { font-size: clamp(14px, 3.8vw, 18px); }
+    .qnum { font-size: clamp(12px, 3.2vw, 15px); }
+    .prayer-text { font-size: clamp(18px, 5vw, 24px); }
+    .label { font-size: clamp(11px, 3vw, 14px); }
+  }
+  @media (max-width: 833px) and (orientation: landscape) {
+    .slide { padding: 24px 32px 40px; }
+    .two-col { grid-template-columns: 1.1fr 1fr; gap: 18px; }
+    .day-illustration { max-width: 200px; order: 0; }
+  }
+</style>
+</head>
+<body>
+
+<svg width="0" height="0" style="position: absolute;">
+  <defs>
+    <!-- Day 1: A path forking and fading into fog -->
+    <symbol id="day1-svg" viewBox="0 0 1024 1024">
+      <line x1="512" y1="860" x2="512" y2="560" stroke="#cc785c" stroke-width="5" stroke-linecap="round"/>
+      <path d="M512 560 Q 400 460 300 300" stroke="#cc785c" stroke-width="4" fill="none" stroke-linecap="round" opacity="0.55"/>
+      <path d="M512 560 Q 624 460 724 300" stroke="#cc785c" stroke-width="4" fill="none" stroke-linecap="round" opacity="0.3"/>
+      <circle cx="512" cy="880" r="12" fill="#cc785c"/>
+      <circle cx="300" cy="280" r="8" fill="#cc785c" opacity="0.5"/>
+      <circle cx="724" cy="280" r="8" fill="#cc785c" opacity="0.3"/>
+    </symbol>
+    <!-- Day 2: A blocked road turning direction -->
+    <symbol id="day2-svg" viewBox="0 0 1024 1024">
+      <line x1="180" y1="512" x2="620" y2="512" stroke="#cc785c" stroke-width="5" stroke-linecap="round"/>
+      <line x1="700" y1="330" x2="700" y2="700" stroke="#cc785c" stroke-width="5" stroke-linecap="round" opacity="0.85"/>
+      <path d="M 620 512 Q 662 512 662 570 Q 662 650 560 705" stroke="#cc785c" stroke-width="4" fill="none" stroke-linecap="round" opacity="0.6"/>
+      <path d="M 518 662 L 560 705 L 604 658" stroke="#cc785c" stroke-width="4" fill="none" stroke-linecap="round" stroke-linejoin="round" opacity="0.6"/>
+      <circle cx="180" cy="512" r="10" fill="#cc785c"/>
+    </symbol>
+    <!-- Day 3: Light rays breaking out past a dashed circle -->
+    <symbol id="day3-svg" viewBox="0 0 1024 1024">
+      <circle cx="512" cy="512" r="180" stroke="#cc785c" stroke-width="4" fill="none" stroke-dasharray="10 14" opacity="0.5"/>
+      <line x1="512" y1="512" x2="512" y2="140" stroke="#cc785c" stroke-width="4" stroke-linecap="round"/>
+      <line x1="512" y1="512" x2="800" y2="300" stroke="#cc785c" stroke-width="4" stroke-linecap="round" opacity="0.8"/>
+      <line x1="512" y1="512" x2="230" y2="760" stroke="#cc785c" stroke-width="4" stroke-linecap="round" opacity="0.6"/>
+      <circle cx="512" cy="512" r="26" fill="#cc785c"/>
+      <circle cx="512" cy="140" r="10" fill="#cc785c"/>
+      <circle cx="800" cy="300" r="10" fill="#cc785c" opacity="0.8"/>
+      <circle cx="230" cy="760" r="10" fill="#cc785c" opacity="0.6"/>
+    </symbol>
+    <!-- Day 4: Three linked circles standing together -->
+    <symbol id="day4-svg" viewBox="0 0 1024 1024">
+      <circle cx="512" cy="300" r="34" fill="#cc785c"/>
+      <circle cx="300" cy="620" r="30" fill="#cc785c" opacity="0.85"/>
+      <circle cx="724" cy="620" r="30" fill="#cc785c" opacity="0.7"/>
+      <path d="M512 334 Q 400 470 300 590" stroke="#cc785c" stroke-width="3.5" fill="none" stroke-linecap="round" opacity="0.5"/>
+      <path d="M512 334 Q 624 470 724 590" stroke="#cc785c" stroke-width="3.5" fill="none" stroke-linecap="round" opacity="0.5"/>
+      <path d="M330 640 Q 512 740 694 640" stroke="#cc785c" stroke-width="3.5" fill="none" stroke-linecap="round" opacity="0.4"/>
+    </symbol>
+    <!-- Day 5: A small seed rippling outward -->
+    <symbol id="day5-svg" viewBox="0 0 1024 1024">
+      <circle cx="512" cy="700" r="18" fill="#cc785c"/>
+      <circle cx="512" cy="700" r="90" stroke="#cc785c" stroke-width="3" fill="none" opacity="0.5"/>
+      <circle cx="512" cy="700" r="180" stroke="#cc785c" stroke-width="2.5" fill="none" opacity="0.32"/>
+      <circle cx="512" cy="700" r="280" stroke="#cc785c" stroke-width="2" fill="none" opacity="0.18"/>
+      <path d="M512 682 Q 480 500 512 300" stroke="#cc785c" stroke-width="4" fill="none" stroke-linecap="round" opacity="0.7"/>
+      <path d="M512 400 Q 560 380 590 330" stroke="#cc785c" stroke-width="3" fill="none" stroke-linecap="round" opacity="0.6"/>
+      <path d="M512 460 Q 460 440 430 390" stroke="#cc785c" stroke-width="3" fill="none" stroke-linecap="round" opacity="0.6"/>
+    </symbol>
+  </defs>
+</svg>
+
+<div class="stage">
+  <div class="deck" id="deck">
+    <div class="corner left">Dead End, New Beginning · 5-Day Devotional</div>
+    <div class="corner right"><span id="curIdx">1</span> / <span id="totIdx">16</span></div>
+    <div class="nav-zone left" id="navLeft"><div class="arrow">←</div></div>
+    <div class="nav-zone right" id="navRight"><div class="arrow">→</div></div>
+
+    <div class="reel" id="reel">
+
+      <!-- 1. Series Intro -->
+      <section class="slide bg-canvas" data-bg="light">
+        <div class="slide-inner">
+          <div class="label build">Acts 16:6–15 · Discerning the Spirit's Guidance</div>
+          <h1 class="display-lg build">Dead End,<br/>New Beginning.</h1>
+          <p class="body build" style="margin-top: 8px;">
+            One reading a day — a single verse, a key truth, a short meditation, and a prayer. Five days to walk together through the week.
+          </p>
+          <div class="day-grid build">
+            <div class="day-tile" data-goto="1" role="button" tabindex="0"><span class="num">DAY 01</span><span class="scrip">Ps 77:19</span><span class="ttl">The Question Is the Sign.</span></div>
+            <div class="day-tile" data-goto="4" role="button" tabindex="0"><span class="num">DAY 02</span><span class="scrip">Acts 16:6-7</span><span class="ttl">A Closed Door Is Guidance.</span></div>
+            <div class="day-tile" data-goto="7" role="button" tabindex="0"><span class="num">DAY 03</span><span class="scrip">Isa 55:8</span><span class="ttl">Too Great to Contain.</span></div>
+            <div class="day-tile" data-goto="10" role="button" tabindex="0"><span class="num">DAY 04</span><span class="scrip">Acts 16:9-10</span><span class="ttl">Discerning Together.</span></div>
+            <div class="day-tile" data-goto="13" role="button" tabindex="0"><span class="num">DAY 05</span><span class="scrip">Acts 16:12</span><span class="ttl">Waiting on His Freedom.</span></div>
+          </div>
+        </div>
+      </section>
+
+      <!-- DAY 1 -->
+      <section class="slide bg-canvas" data-bg="light">
+        <div class="slide-inner two-col">
+          <div>
+            <div class="label build">DAY 01 · The Question Is the Sign</div>
+            <h2 class="display-xl build">The Very Question<br/>Is Already<br/>an Answer.</h2>
+            <p class="subhead build">If you are earnestly asking what God's will is, that itself is evidence you are in the middle of hardship.</p>
+            <div class="scripture build">
+              <p class="quote">"Your way was through the sea, your path through the great waters; yet your footprints were unseen."</p>
+              <p class="cite">Psalm 77:19 · ESV</p>
+            </div>
+          </div>
+          <div class="day-illustration build"><svg><use href="#day1-svg"/></svg></div>
+        </div>
+      </section>
+      <section class="slide bg-canvas" data-bg="light">
+        <div class="slide-inner">
+          <div class="label build">DAY 01 · Meditation</div>
+          <h3 class="key-pull build">No one ever asks,<br/>"Why is everything going so well?"</h3>
+          <p class="body build" style="margin-top: 18px;">
+            In ministry, people almost always ask about God's will in the same kinds of moments — when prayers go unanswered for years, when suffering makes no sense, when faithful obedience brings no visible change.
+          </p>
+          <p class="body build" style="margin-top: 14px;">
+            One pastor recalls how his own uncertain, undecided years — the ones that felt like wasted time — turned out to be exactly the path that led him to where he stands today. <span class="strong">What we cannot see now, we often see clearly only in hindsight.</span>
+          </p>
+        </div>
+      </section>
+      <section class="slide bg-card" data-bg="light">
+        <div class="slide-inner">
+          <div class="label build">DAY 01 · Reflect + Pray</div>
+          <h3 class="display-md build">Name the question you are carrying right now.</h3>
+          <div class="qline build">
+            <span class="qnum">01</span>
+            <span class="qtext">What is the question you are most earnestly asking God these days?</span>
+          </div>
+          <div class="qline build">
+            <span class="qnum">02</span>
+            <span class="qtext">If that very question is a sign of hardship, what does it reveal about where you are right now?</span>
+          </div>
+          <div class="prayer-divider build"></div>
+          <p class="prayer-text build">
+            Lord,<br/>
+            even in this season I cannot understand,<br/>help me trust that your purpose is at work. Let me one day look back and call it grace.
+          </p>
+          <span class="amen build">— Amen.</span>
+        </div>
+      </section>
+
+      <!-- DAY 2 -->
+      <section class="slide bg-canvas" data-bg="light">
+        <div class="slide-inner two-col">
+          <div>
+            <div class="label build">DAY 02 · A Closed Door Is Guidance</div>
+            <h2 class="display-xl build">Even a Closed Door<br/>Can Be<br/>the Spirit's Leading.</h2>
+            <p class="subhead build">It was not opposition, not disaster. It was the Holy Spirit who closed the door.</p>
+            <div class="scripture build">
+              <p class="quote">"And they went through the region of Phrygia and Galatia, having been forbidden by the Holy Spirit to speak the word in Asia... the Spirit of Jesus did not allow them."</p>
+              <p class="cite">Acts 16:6–7 · ESV</p>
+            </div>
+          </div>
+          <div class="day-illustration build"><svg><use href="#day2-svg"/></svg></div>
+        </div>
+      </section>
+      <section class="slide bg-canvas" data-bg="light">
+        <div class="slide-inner">
+          <div class="label build">DAY 02 · Meditation</div>
+          <h3 class="key-pull build">The hardest discernment comes<br/>when a clearly good plan is blocked.</h3>
+          <p class="body build" style="margin-top: 18px;">
+            Paul had prepared everything to reach Asia through Ephesus, with Timothy and Silas at his side. It was a strong, sensible, well-resourced plan. And the Spirit shut the door.
+          </p>
+          <p class="body build" style="margin-top: 14px;">
+            Discerning between an obviously right path and an obviously wrong one is rarely difficult. <span class="strong">The real struggle comes when something good for God's kingdom is blocked anyway.</span> Paul's team wandered, uncertain which way to turn next.
+          </p>
+        </div>
+      </section>
+      <section class="slide bg-card" data-bg="light">
+        <div class="slide-inner">
+          <div class="label build">DAY 02 · Reflect + Pray</div>
+          <h3 class="display-md build">Recall a plan that was good — and still got blocked.</h3>
+          <div class="qline build">
+            <span class="qnum">01</span>
+            <span class="qtext">Have you ever had a plan you were sure was good for God's kingdom, only to see the door close?</span>
+          </div>
+          <div class="qline build">
+            <span class="qnum">02</span>
+            <span class="qtext">How did you understand that closed door at the time — and how do you see it now?</span>
+          </div>
+          <div class="prayer-divider build"></div>
+          <p class="prayer-text build">
+            Lord,<br/>
+            when my plans are blocked,<br/>teach me to seek your Spirit before I complain. Let me trust there is grace behind every closed door.
+          </p>
+          <span class="amen build">— Amen.</span>
+        </div>
+      </section>
+
+      <!-- DAY 3 -->
+      <section class="slide bg-dark" data-bg="dark">
+        <div class="slide-inner two-col">
+          <div>
+            <div class="label build">DAY 03 · Too Great to Contain</div>
+            <h2 class="display-xl build">Meeting a God<br/>Who Cannot Be<br/>Boxed In.</h2>
+            <p class="subhead build">The moment I demand God answer prayer exactly as I expect, I have already shrunk him down to my own size.</p>
+            <div class="scripture build">
+              <p class="quote">"For my thoughts are not your thoughts, neither are your ways my ways, declares the LORD."</p>
+              <p class="cite">Isaiah 55:8 · ESV</p>
+            </div>
+          </div>
+          <div class="day-illustration build"><svg><use href="#day3-svg"/></svg></div>
+        </div>
+      </section>
+      <section class="slide bg-canvas" data-bg="light">
+        <div class="slide-inner">
+          <div class="label build">DAY 03 · Meditation</div>
+          <h3 class="key-pull build">The Spirit's work<br/>is not always miracles and success.</h3>
+          <p class="body build" style="margin-top: 18px;">
+            We assume that whenever the Spirit is at work, supernatural power and smooth success must follow. Yet in this passage, the Spirit blocked the path of faithful, well-prepared workers instead.
+          </p>
+          <p class="body build" style="margin-top: 14px;">
+            The danger in movements built on signs and spiritual experience is treating God like <span class="strong">a well-solved equation</span> — a God with no freedom left, tamed by our own expectations and logic. Accepting the God who exceeds our understanding is what real faith looks like.
+          </p>
+        </div>
+      </section>
+      <section class="slide bg-card" data-bg="light">
+        <div class="slide-inner">
+          <div class="label build">DAY 03 · Reflect + Pray</div>
+          <h3 class="display-md build">Release the God you've kept inside your own box.</h3>
+          <div class="qline build">
+            <span class="qnum">01</span>
+            <span class="qtext">In what ways have I limited God to only working in the manner I expect?</span>
+          </div>
+          <div class="qline build">
+            <span class="qnum">02</span>
+            <span class="qtext">How did I respond the last time God answered in a way I did not anticipate?</span>
+          </div>
+          <div class="prayer-divider build"></div>
+          <p class="prayer-text build">
+            Lord,<br/>
+            forgive me for confining you<br/>within the walls of my own understanding. Teach me to trust you even when you remain a mystery to me.
+          </p>
+          <span class="amen build">— Amen.</span>
+        </div>
+      </section>
+
+      <!-- DAY 4 -->
+      <section class="slide bg-canvas" data-bg="light">
+        <div class="slide-inner two-col">
+          <div>
+            <div class="label build">DAY 04 · Discerning Together</div>
+            <h2 class="display-xl build">Not "I,"<br/>but "We"<br/>Discern Together.</h2>
+            <p class="subhead build">Paul alone saw the vision, yet it was "we" who recognized it as the Lord's calling.</p>
+            <div class="scripture build">
+              <p class="quote">"A man of Macedonia was standing there, urging him and saying, 'Come over to Macedonia and help us.' ... concluding that God had called us to preach the gospel to them."</p>
+              <p class="cite">Acts 16:9–10 · ESV</p>
+            </div>
+          </div>
+          <div class="day-illustration build"><svg><use href="#day4-svg"/></svg></div>
+        </div>
+      </section>
+      <section class="slide bg-canvas" data-bg="light">
+        <div class="slide-inner">
+          <div class="label build">DAY 04 · Meditation</div>
+          <h3 class="key-pull build">Humility is remembering<br/>you are part of the community before you lead it.</h3>
+          <p class="body build" style="margin-top: 18px;">
+            Paul was an apostle who had met the risen Christ himself, and the true leader of this journey. Yet he did not declare his vision as final truth and hand down a one-way decision to the others.
+          </p>
+          <p class="body build" style="margin-top: 14px;">
+            Instead, he brought it to Silas and Timothy and discerned it together. <span class="strong">Authoritarianism is born the moment a leader forgets they are also a member of the community.</span> Humble leadership discerns together, even with conviction in hand.
+          </p>
+        </div>
+      </section>
+      <section class="slide bg-card" data-bg="light">
+        <div class="slide-inner">
+          <div class="label build">DAY 04 · Reflect + Pray</div>
+          <h3 class="display-md build">Recall a moment you decided alone, without asking anyone.</h3>
+          <div class="qline build">
+            <span class="qnum">01</span>
+            <span class="qtext">What decision have you recently pushed forward on your own conviction alone?</span>
+          </div>
+          <div class="qline build">
+            <span class="qnum">02</span>
+            <span class="qtext">Who could you have brought into that discernment instead?</span>
+          </div>
+          <div class="prayer-divider build"></div>
+          <p class="prayer-text build">
+            Lord,<br/>
+            the stronger my conviction,<br/>make me all the more humble. Give me the wisdom to listen and discern together with others.
+          </p>
+          <span class="amen build">— Amen.</span>
+        </div>
+      </section>
+
+      <!-- DAY 5 -->
+      <section class="slide bg-canvas" data-bg="light">
+        <div class="slide-inner two-col">
+          <div>
+            <div class="label build">DAY 05 · Waiting on His Freedom</div>
+            <h2 class="display-xl build">What Looks Small<br/>Is Where the Story<br/>Actually Begins.</h2>
+            <p class="subhead build">In a Gentile city with not even a synagogue, at a riverside place of prayer, God began a work that would reshape a continent.</p>
+            <div class="scripture build">
+              <p class="quote">"and from there to Philippi, which is a leading city of the district of Macedonia and a Roman colony. We remained in this city some days."</p>
+              <p class="cite">Acts 16:12 · ESV</p>
+            </div>
+          </div>
+          <div class="day-illustration build"><svg><use href="#day5-svg"/></svg></div>
+        </div>
+      </section>
+      <section class="slide bg-canvas" data-bg="light">
+        <div class="slide-inner">
+          <div class="label build">DAY 05 · Meditation</div>
+          <h3 class="key-pull build">Ministry, mission, and life itself<br/>do not depend on us.</h3>
+          <p class="body build" style="margin-top: 18px;">
+            The conversion of one merchant woman, Lydia, may have looked like a modest harvest to a team that had sailed across the sea to get there. Yet from that one unremarkable moment, God began the gospel movement that would transform an entire continent.
+          </p>
+          <p class="body build" style="margin-top: 14px;">
+            True faith is love, and love sets its object free. <span class="strong">Releasing God from the boundaries of our expectations, and joyfully joining whatever he chooses to do</span> — that is what it means to believe.
+          </p>
+        </div>
+      </section>
+      <section class="slide bg-dark" data-bg="dark">
+        <div class="slide-inner">
+          <div class="label build">Closing Prayer</div>
+          <h3 class="display-md build">One Thing to Carry<br/>from This Week's Devotion.</h3>
+          <div class="qline build">
+            <span class="qnum">01</span>
+            <span class="qtext">As the new semester begins, who around you is asking, "Come over and help us"?</span>
+          </div>
+          <div class="qline build">
+            <span class="qnum">02</span>
+            <span class="qtext">This week, in what one area will you set God free from your own expectations?</span>
+          </div>
+          <div class="prayer-divider build"></div>
+          <p class="prayer-text build">
+            Lord,<br/>
+            teach me to wait for your free work<br/>rather than insist on my own plan. Let me hold onto the truth I already know and trust your faithful timing.
+          </p>
+          <span class="amen build">— Amen.</span>
+        </div>
+      </section>
+
+    </div>
+  </div>
+</div>
+
+<script>
+  const deck = document.getElementById("deck");
+  const slides = Array.from(document.querySelectorAll(".slide"));
+  const total = slides.length;
+  const curEl = document.getElementById("curIdx");
+  const totEl = document.getElementById("totIdx");
+  totEl.textContent = total;
+  let cur = 0;
+  function applyMode() {
+    const isDark = (slides[cur].dataset.bg || "light") === "dark";
+    deck.classList.toggle("dark-mode", isDark);
+  }
+  function snapPositions(activeIdx) {
+    slides.forEach((s, i) => {
+      s.classList.remove("is-current", "is-prev", "is-next", "is-animating");
+      if (i === activeIdx) s.classList.add("is-current");
+      else if (i < activeIdx) s.classList.add("is-prev");
+      else s.classList.add("is-next");
+    });
+  }
+  function go(idx, push = true) {
+    idx = Math.max(0, Math.min(total - 1, idx));
+    if (idx === cur && slides[cur].classList.contains("is-current")) return;
+    const dir = idx >= cur ? "fwd" : "back";
+    const oldCur = cur;
+    slides.forEach((s, i) => {
+      if (i === oldCur || i === idx) return;
+      s.classList.remove("is-current", "is-prev", "is-next", "is-animating");
+      if (i < idx) s.classList.add("is-prev");
+      else s.classList.add("is-next");
+    });
+    const out = slides[oldCur], inc = slides[idx];
+    out.classList.add("is-animating"); inc.classList.add("is-animating");
+    requestAnimationFrame(() => {
+      out.classList.remove("is-current");
+      out.classList.add(dir === "fwd" ? "is-prev" : "is-next");
+      inc.classList.remove("is-prev", "is-next");
+      inc.classList.add("is-current");
+    });
+    cur = idx;
+    curEl.textContent = cur + 1;
+    applyMode();
+    if (push) history.replaceState(null, "", `#${cur + 1}`);
+  }
+  const initialHash = parseInt(location.hash.replace("#", ""), 10);
+  const startIdx = Number.isFinite(initialHash) && initialHash >= 1 ? Math.min(initialHash - 1, total - 1) : 0;
+  cur = startIdx;
+  snapPositions(startIdx);
+  curEl.textContent = cur + 1;
+  applyMode();
+  function next() { go(cur + 1); }
+  function prev() { go(cur - 1); }
+  document.addEventListener("keydown", (e) => {
+    switch (e.key) {
+      case "ArrowRight": case " ": case "PageDown": e.preventDefault(); next(); break;
+      case "ArrowLeft": case "PageUp": e.preventDefault(); prev(); break;
+      case "Home": e.preventDefault(); go(0); break;
+      case "End": e.preventDefault(); go(total - 1); break;
+      case "f": case "F":
+        if (!document.fullscreenElement) document.documentElement.requestFullscreen?.();
+        else document.exitFullscreen?.();
+        break;
+    }
+  });
+  document.getElementById("navLeft").addEventListener("click", prev);
+  document.getElementById("navRight").addEventListener("click", next);
+  document.querySelectorAll(".day-tile[data-goto]").forEach(tile => {
+    const handler = (e) => {
+      e.preventDefault();
+      go(parseInt(tile.dataset.goto, 10));
+    };
+    tile.addEventListener("click", handler);
+    tile.addEventListener("keydown", (e) => {
+      if (e.key === "Enter" || e.key === " ") handler(e);
+    });
+  });
+  let tx = null;
+  deck.addEventListener("touchstart", (e) => { tx = e.touches[0].clientX; }, { passive: true });
+  deck.addEventListener("touchend", (e) => {
+    if (tx === null) return;
+    const dx = e.changedTouches[0].clientX - tx;
+    if (Math.abs(dx) > 60) (dx < 0 ? next : prev)();
+    tx = null;
+  });
+</script>
+</body>
+</html>
