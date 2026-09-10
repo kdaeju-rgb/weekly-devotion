@@ -1,0 +1,687 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>5일 묵상 — 일상의 좁은 길 (사도행전 18장 9-17절)</title>
+<link href="https://fonts.googleapis.com/css2?family=Nanum+Myeongjo:wght@400;700;800&family=Noto+Sans+KR:wght@400;500;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/suit@3.0.1/dist/suit.css">
+<style>
+  :root {
+    --primary: #cc785c;
+    --canvas: #faf9f5;
+    --card: #efe9de;
+    --dark: #181715;
+    --ink: #141413;
+    --body: #3d3d3a;
+    --muted: #6c6a64;
+    --on-dark: #faf9f5;
+    --on-dark-soft: #a09d96;
+    --hairline: #e6dfd8;
+    --font-display: "Nanum Myeongjo", "NanumMyeongjo", "Noto Serif KR", Georgia, serif;
+    --font-sans: "SUIT", "SUIT Variable", "Noto Sans KR", -apple-system, BlinkMacSystemFont, "Apple SD Gothic Neo", system-ui, sans-serif;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body { height: 100%; overflow: hidden; font-family: var(--font-sans); background: #1a1a1a; -webkit-font-smoothing: antialiased; }
+  .label, .display-xl, .display-lg, .display-md, .subhead, .body,
+  .key-pull, .scripture .quote, .scripture .cite, .qtext, .qnum, .prayer-text,
+  .day-tile .ttl, .day-tile .num, .day-tile .scrip, .corner, .amen {
+    word-break: keep-all; overflow-wrap: break-word;
+  }
+
+  .stage {
+    position: fixed; inset: 0;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .deck {
+    position: relative;
+    aspect-ratio: 16 / 9;
+    width: 100vw; height: auto;
+    max-height: 100vh;
+    background: var(--canvas);
+    overflow: hidden;
+  }
+  @supports not (aspect-ratio: 16 / 9) {
+    .deck { width: 100vw; height: 56.25vw; }
+  }
+
+  .reel { position: relative; width: 100%; height: 100%; perspective: 1800px; transform-style: preserve-3d; }
+  .slide {
+    position: absolute; inset: 0;
+    display: flex; align-items: center;
+    padding: clamp(28px, 4.5vh, 60px) clamp(36px, 5.5vw, 90px);
+    opacity: 0; pointer-events: none;
+    transform: translateX(100%);
+    overflow: auto;
+  }
+  .slide.is-animating { transition: transform 0.6s cubic-bezier(.65,0,.2,1), opacity 0.5s ease; }
+  .slide.is-current { opacity: 1; pointer-events: auto; transform: translateX(0); z-index: 2; }
+  .slide.is-prev { transform: translateX(-100%); opacity: 1; }
+  .slide.is-next { transform: translateX(100%); opacity: 1; }
+
+  .bg-canvas { background: var(--canvas); color: var(--ink); }
+  .bg-card { background: var(--card); color: var(--ink); }
+  .bg-dark { background: var(--dark); color: var(--on-dark); }
+
+  .slide-inner { width: 100%; max-width: 1200px; margin: 0 auto; }
+  .two-col { display: grid; grid-template-columns: 1.05fr 1fr; gap: clamp(28px, 4vw, 60px); align-items: center; }
+
+  .label {
+    font-family: var(--font-sans); font-weight: 700;
+    font-size: clamp(16px, 1.4vw, 21px); letter-spacing: 0.08em;
+    text-transform: uppercase; color: var(--muted);
+    margin-bottom: 26px;
+  }
+  .bg-dark .label { color: var(--on-dark-soft); }
+
+  .display-xl {
+    font-family: var(--font-display); font-weight: 800;
+    font-size: clamp(44px, 5.8vw, 82px);
+    line-height: 1.10; letter-spacing: -0.025em;
+    margin-bottom: 20px;
+  }
+  .display-lg {
+    font-family: var(--font-display); font-weight: 800;
+    font-size: clamp(38px, 4.6vw, 64px);
+    line-height: 1.12; letter-spacing: -0.022em;
+    margin-bottom: 18px;
+  }
+  .display-md {
+    font-family: var(--font-display); font-weight: 800;
+    font-size: clamp(32px, 3.6vw, 50px);
+    line-height: 1.22; letter-spacing: -0.018em;
+    margin-bottom: 16px;
+  }
+  .subhead {
+    font-family: var(--font-sans); font-weight: 500;
+    font-size: clamp(20px, 2vw, 27px);
+    line-height: 1.5; letter-spacing: -0.01em;
+    color: var(--body); margin-bottom: 24px;
+  }
+  .bg-dark .subhead { color: var(--on-dark-soft); }
+
+  .body {
+    font-family: var(--font-sans); font-weight: 400;
+    font-size: clamp(18px, 1.7vw, 23px);
+    line-height: 1.7; letter-spacing: -0.005em;
+    color: var(--body);
+  }
+  .bg-dark .body { color: var(--on-dark-soft); }
+  .strong { font-weight: 600; color: var(--ink); }
+  .bg-dark .strong { color: var(--on-dark); }
+
+  .scripture {
+    margin-top: 24px;
+    padding-left: 20px;
+    border-left: 4px solid var(--primary);
+  }
+  .scripture .quote {
+    font-family: var(--font-display); font-weight: 700;
+    font-size: clamp(22px, 2.3vw, 30px);
+    line-height: 1.42; letter-spacing: -0.012em;
+  }
+  .scripture .cite {
+    margin-top: 12px;
+    font-family: var(--font-sans); font-weight: 700;
+    font-size: clamp(15px, 1.3vw, 19px); letter-spacing: 0.07em;
+    text-transform: uppercase; color: var(--muted);
+  }
+  .bg-dark .scripture .cite { color: var(--on-dark-soft); }
+
+  .key-pull {
+    font-family: var(--font-display); font-weight: 800;
+    font-size: clamp(34px, 4vw, 56px);
+    line-height: 1.22; letter-spacing: -0.022em;
+    margin-bottom: 24px;
+  }
+
+  .qline { display: grid; grid-template-columns: 64px 1fr; gap: 18px; padding: 16px 0; align-items: baseline; }
+  .qline + .qline { border-top: 1px solid var(--hairline); }
+  .bg-dark .qline + .qline { border-top: 1px solid rgba(255,255,255,0.08); }
+  .qnum {
+    font-family: var(--font-sans); font-weight: 700;
+    font-size: clamp(16px, 1.4vw, 20px); letter-spacing: 0.08em;
+    color: var(--primary);
+  }
+  .qtext {
+    font-family: var(--font-sans); font-weight: 500;
+    font-size: clamp(19px, 1.8vw, 24px); line-height: 1.58; letter-spacing: -0.005em;
+  }
+
+  .prayer-text {
+    font-family: var(--font-display); font-weight: 700;
+    font-size: clamp(26px, 2.7vw, 36px);
+    line-height: 1.48; letter-spacing: -0.018em;
+  }
+  .prayer-divider { width: 72px; height: 3px; background: var(--primary); margin: 34px 0 26px; }
+  .amen {
+    display: inline-block; margin-top: 20px;
+    font-family: var(--font-sans); font-weight: 700;
+    font-size: clamp(16px, 1.3vw, 19px); letter-spacing: 0.1em;
+    color: var(--muted);
+  }
+  .bg-dark .amen { color: var(--on-dark-soft); }
+
+  .day-illustration { width: 100%; max-width: 480px; aspect-ratio: 1 / 1; }
+  .day-illustration svg { width: 100%; height: 100%; display: block; }
+
+  .day-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 14px; margin-top: 32px; max-width: 1100px; }
+  .day-tile {
+    padding: 22px 18px; border-radius: 14px;
+    border: 1px solid var(--hairline); background: var(--canvas);
+    display: flex; flex-direction: column; gap: 8px; min-height: 200px;
+    transition: border-color 0.2s ease, transform 0.2s ease;
+  }
+  .day-tile { cursor: pointer; }
+  .day-tile:hover { border-color: var(--primary); transform: translateY(-2px); }
+  .day-tile:focus-visible { outline: 2px solid var(--primary); outline-offset: 3px; }
+  .day-tile:active { transform: translateY(0); }
+  .day-tile .num { font-family: var(--font-sans); font-weight: 700; font-size: 14px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--primary); }
+  .day-tile .scrip { font-family: var(--font-sans); font-weight: 700; font-size: 13px; letter-spacing: 0.06em; text-transform: uppercase; color: var(--muted); }
+  .day-tile .ttl { font-family: var(--font-display); font-weight: 800; font-size: 24px; line-height: 1.2; letter-spacing: -0.018em; margin-top: auto; }
+
+  .corner {
+    position: absolute; bottom: 20px; z-index: 5;
+    font-family: var(--font-sans); font-weight: 700;
+    font-size: 14px; letter-spacing: 0.08em; text-transform: uppercase;
+    color: var(--muted); pointer-events: none;
+  }
+  .bg-dark .corner { color: var(--on-dark-soft); }
+  .corner.left { left: clamp(28px, 5vw, 60px); }
+  .corner.right { right: clamp(28px, 5vw, 60px); font-variant-numeric: tabular-nums; }
+
+  .nav-zone { position: absolute; top: 0; bottom: 0; width: 18%; z-index: 30; cursor: pointer; }
+  .nav-zone.left { left: 0; }
+  .nav-zone.right { right: 0; }
+  .nav-zone .arrow {
+    position: absolute; top: 50%; transform: translateY(-50%);
+    width: 44px; height: 44px; border-radius: 8px;
+    background: rgba(20,20,19,0.06); color: var(--ink);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 18px; opacity: 0; transition: opacity 0.25s;
+  }
+  .nav-zone.left .arrow { left: 16px; }
+  .nav-zone.right .arrow { right: 16px; }
+  .nav-zone:hover .arrow { opacity: 1; }
+  .deck.dark-mode .nav-zone .arrow { background: rgba(255,255,255,0.12); color: var(--on-dark); }
+
+  .build { opacity: 0; transform: translateY(12px); transition: opacity 0.5s ease, transform 0.5s cubic-bezier(.2,.7,.3,1); }
+  .slide.is-current .build { opacity: 1; transform: translateY(0); }
+  .slide.is-current .build:nth-of-type(1) { transition-delay: 0.08s; }
+  .slide.is-current .build:nth-of-type(2) { transition-delay: 0.18s; }
+  .slide.is-current .build:nth-of-type(3) { transition-delay: 0.28s; }
+  .slide.is-current .build:nth-of-type(4) { transition-delay: 0.38s; }
+
+  @media (max-width: 833px) {
+    .stage { background: var(--canvas); }
+    .deck {
+      aspect-ratio: auto;
+      width: 100vw;
+      height: 100dvh;
+      max-height: 100dvh;
+    }
+    @supports not (height: 100dvh) {
+      .deck { height: 100vh; max-height: 100vh; }
+    }
+    .slide {
+      padding: 56px 20px calc(72px + env(safe-area-inset-bottom));
+      align-items: flex-start;
+    }
+    .two-col { grid-template-columns: 1fr; gap: 22px; align-items: start; }
+    .day-illustration { max-width: 180px; margin: 8px auto 0; order: 2; }
+    .day-grid {
+      grid-template-columns: 1fr;
+      gap: 10px; margin-top: 22px; max-width: 100%;
+    }
+    .day-tile {
+      min-height: auto;
+      flex-direction: row; align-items: center; gap: 12px;
+      padding: 16px 18px;
+    }
+    .day-tile .ttl { margin-top: 0; font-size: 18px; flex: 1; }
+    .day-tile .num, .day-tile .scrip { font-size: 11px; white-space: nowrap; }
+
+    .corner {
+      font-size: 11px;
+      bottom: calc(20px + env(safe-area-inset-bottom));
+      letter-spacing: 0.06em;
+    }
+    .corner.left { left: 16px; max-width: 60%; }
+    .corner.right { right: 16px; }
+
+    .nav-zone { width: 14%; }
+    .nav-zone .arrow { width: 36px; height: 36px; font-size: 16px; }
+
+    .display-xl { font-size: clamp(38px, 9vw, 56px); }
+    .display-lg { font-size: clamp(34px, 8vw, 48px); }
+    .display-md { font-size: clamp(28px, 7vw, 40px); }
+    .key-pull { font-size: clamp(28px, 7vw, 38px); }
+    .subhead { font-size: clamp(18px, 4.6vw, 22px); }
+    .body { font-size: clamp(16px, 4.2vw, 19px); }
+    .scripture .quote { font-size: clamp(19px, 4.8vw, 24px); }
+    .scripture .cite { font-size: clamp(13px, 3.4vw, 16px); }
+    .qtext { font-size: clamp(17px, 4.4vw, 20px); }
+    .qnum { font-size: clamp(14px, 3.6vw, 17px); }
+    .prayer-text { font-size: clamp(22px, 5.8vw, 28px); }
+    .label { font-size: clamp(13px, 3.4vw, 17px); }
+  }
+  @media (max-width: 833px) and (orientation: landscape) {
+    .slide { padding: 24px 32px 40px; }
+    .two-col { grid-template-columns: 1.1fr 1fr; gap: 18px; }
+    .day-illustration { max-width: 220px; order: 0; }
+  }
+</style>
+</head>
+<body>
+
+<svg width="0" height="0" style="position: absolute;">
+  <defs>
+    <!-- Day 1: 세상의 민낯 - 깨진 고리와 흩어지는 시선 (조롱과 외면) -->
+    <symbol id="day1-svg" viewBox="0 0 1024 1024">
+      <circle cx="512" cy="512" r="180" stroke="#cc785c" stroke-width="5" fill="none" stroke-dasharray="38 28"/>
+      <line x1="512" y1="260" x2="512" y2="180" stroke="#cc785c" stroke-width="4" stroke-linecap="round"/>
+      <line x1="350" y1="340" x2="286" y2="278" stroke="#cc785c" stroke-width="4" stroke-linecap="round" opacity="0.6"/>
+      <line x1="674" y1="340" x2="738" y2="278" stroke="#cc785c" stroke-width="4" stroke-linecap="round" opacity="0.6"/>
+      <circle cx="512" cy="512" r="40" fill="#cc785c" opacity="0.85"/>
+    </symbol>
+    <!-- Day 2: 두려워 말라 - 어둠 속의 등불 (주님이 함께 계심) -->
+    <symbol id="day2-svg" viewBox="0 0 1024 1024">
+      <path d="M 512 180 C 420 180 350 258 350 358 C 350 456 430 518 430 618 L 594 618 C 594 518 674 456 674 358 C 674 258 604 180 512 180 Z" stroke="#cc785c" stroke-width="5" fill="none"/>
+      <line x1="460" y1="678" x2="564" y2="678" stroke="#cc785c" stroke-width="5" stroke-linecap="round"/>
+      <line x1="480" y1="738" x2="544" y2="738" stroke="#cc785c" stroke-width="5" stroke-linecap="round"/>
+      <circle cx="512" cy="380" r="14" fill="#cc785c"/>
+      <line x1="512" y1="120" x2="512" y2="156" stroke="#cc785c" stroke-width="4" stroke-linecap="round" opacity="0.5"/>
+      <line x1="330" y1="200" x2="356" y2="226" stroke="#cc785c" stroke-width="4" stroke-linecap="round" opacity="0.5"/>
+      <line x1="694" y1="200" x2="668" y2="226" stroke="#cc785c" stroke-width="4" stroke-linecap="round" opacity="0.5"/>
+    </symbol>
+    <!-- Day 3: 세상의 법정 - 기울어진 저울 (방관하는 정의) -->
+    <symbol id="day3-svg" viewBox="0 0 1024 1024">
+      <line x1="512" y1="220" x2="512" y2="760" stroke="#cc785c" stroke-width="5" stroke-linecap="round"/>
+      <line x1="260" y1="340" x2="764" y2="420" stroke="#cc785c" stroke-width="5" stroke-linecap="round"/>
+      <path d="M 190 340 A 90 58 0 0 0 330 340" stroke="#cc785c" stroke-width="4" fill="none"/>
+      <path d="M 694 420 A 90 58 0 0 0 834 420" stroke="#cc785c" stroke-width="4" fill="none"/>
+      <line x1="512" y1="760" x2="420" y2="822" stroke="#cc785c" stroke-width="4" stroke-linecap="round"/>
+      <line x1="512" y1="760" x2="604" y2="822" stroke="#cc785c" stroke-width="4" stroke-linecap="round"/>
+      <line x1="380" y1="822" x2="644" y2="822" stroke="#cc785c" stroke-width="4" stroke-linecap="round"/>
+    </symbol>
+    <!-- Day 4: 생업과 복음 - 천막과 말씀 (일과 복음이 하나됨) -->
+    <symbol id="day4-svg" viewBox="0 0 1024 1024">
+      <path d="M 512 220 L 300 640 L 724 640 Z" stroke="#cc785c" stroke-width="5" fill="none" stroke-linejoin="round"/>
+      <line x1="512" y1="220" x2="512" y2="640" stroke="#cc785c" stroke-width="3" opacity="0.5"/>
+      <path d="M 370 760 Q 512 700 654 760" stroke="#cc785c" stroke-width="4" fill="none" stroke-linecap="round"/>
+      <line x1="370" y1="760" x2="370" y2="806" stroke="#cc785c" stroke-width="4" stroke-linecap="round"/>
+      <line x1="654" y1="760" x2="654" y2="806" stroke="#cc785c" stroke-width="4" stroke-linecap="round"/>
+      <line x1="370" y1="806" x2="654" y2="806" stroke="#cc785c" stroke-width="4" stroke-linecap="round"/>
+    </symbol>
+    <!-- Day 5: 일상의 신실함 - 이어지는 걸음 (1년 6개월의 성실함) -->
+    <symbol id="day5-svg" viewBox="0 0 1024 1024">
+      <line x1="140" y1="640" x2="884" y2="640" stroke="#cc785c" stroke-width="3" opacity="0.35"/>
+      <path d="M 200 640 L 350 590 L 500 540 L 650 480 L 824 410" stroke="#cc785c" stroke-width="4" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+      <circle cx="200" cy="640" r="16" fill="#cc785c" opacity="0.7"/>
+      <circle cx="350" cy="590" r="16" fill="#cc785c" opacity="0.8"/>
+      <circle cx="500" cy="540" r="16" fill="#cc785c" opacity="0.88"/>
+      <circle cx="650" cy="480" r="16" fill="#cc785c" opacity="0.95"/>
+      <circle cx="824" cy="410" r="22" fill="#cc785c"/>
+    </symbol>
+  </defs>
+</svg>
+
+<div class="stage">
+  <div class="deck" id="deck">
+    <div class="corner left">일상의 좁은 길 · 5일 묵상</div>
+    <div class="corner right"><span id="curIdx">1</span> / <span id="totIdx">16</span></div>
+    <div class="nav-zone left" id="navLeft"><div class="arrow">←</div></div>
+    <div class="nav-zone right" id="navRight"><div class="arrow">→</div></div>
+
+    <div class="reel" id="reel">
+
+      <!-- 1. Series intro -->
+      <section class="slide bg-canvas" data-bg="light">
+        <div class="slide-inner">
+          <div class="label build">사도행전 18장 · 갈리오 법정 앞에서</div>
+          <h1 class="display-lg build">일상의 좁은 길</h1>
+          <p class="body build" style="margin-top: 8px;">
+            매일 한 편씩 — 본문 한 구절, 핵심 한 문장, 짧은 묵상글과 기도. 세상의 공정이 아니라 일상의 신실함으로 한 주를 함께 살아갑니다.
+          </p>
+          <div class="day-grid build">
+            <div class="day-tile" data-goto="1" role="button" tabindex="0"><span class="num">DAY 01</span><span class="scrip">행 17:32</span><span class="ttl">세상의 민낯.</span></div>
+            <div class="day-tile" data-goto="4" role="button" tabindex="0"><span class="num">DAY 02</span><span class="scrip">행 18:9-10</span><span class="ttl">두려워 말라.</span></div>
+            <div class="day-tile" data-goto="7" role="button" tabindex="0"><span class="num">DAY 03</span><span class="scrip">행 18:17</span><span class="ttl">세상의 법정.</span></div>
+            <div class="day-tile" data-goto="10" role="button" tabindex="0"><span class="num">DAY 04</span><span class="scrip">행 18:3</span><span class="ttl">생업과 복음.</span></div>
+            <div class="day-tile" data-goto="13" role="button" tabindex="0"><span class="num">DAY 05</span><span class="scrip">행 18:11</span><span class="ttl">일상의 신실함.</span></div>
+          </div>
+        </div>
+      </section>
+
+      <!-- DAY 1 -->
+      <section class="slide bg-canvas" data-bg="light">
+        <div class="slide-inner two-col">
+          <div>
+            <div class="label build">DAY 01 · 세상의 민낯</div>
+            <h2 class="display-xl build">세상은 원래<br/>그런 곳입니다.</h2>
+            <p class="subhead build">바울이 복음을 전했을 때 돌아온 것은 조롱이었습니다. 세상은 언제나 그렇게 반응해 왔습니다.</p>
+            <div class="scripture build">
+              <p class="quote">"어떤 사람들은 조롱하고 어떤 사람들은 이 일에 대하여 다시 듣겠다 하니."</p>
+              <p class="cite">사도행전 17:32</p>
+            </div>
+          </div>
+          <div class="day-illustration build"><svg><use href="#day1-svg"/></svg></div>
+        </div>
+      </section>
+      <section class="slide bg-canvas" data-bg="light">
+        <div class="slide-inner">
+          <div class="label build">DAY 01 · 묵상</div>
+          <h3 class="key-pull build">우리가 붙잡은 공정도,<br/>결국 '나' 중심이었습니다.</h3>
+          <p class="body build" style="margin-top: 18px;">
+            2030 청년들은 공정을 외치지만, 그들이 말하는 공정도 자신에게 유리할 때만 공정이고 손해가 되면 불공정이 됩니다. 능력주의도 헌법적 가치도 결국 <span class="strong">자기중심적 정의</span>일 뿐이었습니다.
+          </p>
+          <p class="body build" style="margin-top: 14px;">
+            세상은 우리가 꿈꾸는 진짜 공정과 정의를 실현할 능력이 없습니다. 바울이 아덴에서 조롱당했듯, 세상은 참 하나님을 전하는 이들을 언제나 낯설어하고 비웃습니다.
+          </p>
+        </div>
+      </section>
+      <section class="slide bg-card" data-bg="light">
+        <div class="slide-inner">
+          <div class="label build">DAY 01 · 적용 + 기도</div>
+          <h3 class="display-md build">이번 주, 내가 바라본 곳을 점검하기.</h3>
+          <div class="qline build">
+            <span class="qnum">01</span>
+            <span class="qtext">이번 주, 세상이 나를 실망시킨 순간은 언제였습니까?</span>
+          </div>
+          <div class="qline build">
+            <span class="qnum">02</span>
+            <span class="qtext">그때 나는 위로와 해답을 어디에서 찾으려 했습니까?</span>
+          </div>
+          <div class="prayer-divider build"></div>
+          <p class="prayer-text build">
+            주님, 세상이 아니라 주님께 제 소망을 두게 하소서.<br/>
+            공정과 정의를 세상이 아니라 주님 안에서 찾게 하소서.
+          </p>
+          <span class="amen build">— 아멘.</span>
+        </div>
+      </section>
+
+      <!-- DAY 2 -->
+      <section class="slide bg-canvas" data-bg="light">
+        <div class="slide-inner two-col">
+          <div>
+            <div class="label build">DAY 02 · 두려워 말라</div>
+            <h2 class="display-xl build">두려워 말고<br/>말하라 하셨습니다.</h2>
+            <p class="subhead build">절망적인 고린도 땅에서, 주님은 환상 중에 바울을 찾아오셨습니다.</p>
+            <div class="scripture build">
+              <p class="quote">"두려워하지 말며 침묵하지 말고 말하라 내가 너와 함께 있으매 어떤 사람도 너를 대적하여 해롭게 할 자가 없을 것이니 이는 이 성중에 내 백성이 많음이라."</p>
+              <p class="cite">사도행전 18:9-10</p>
+            </div>
+          </div>
+          <div class="day-illustration build"><svg><use href="#day2-svg"/></svg></div>
+        </div>
+      </section>
+      <section class="slide bg-canvas" data-bg="light">
+        <div class="slide-inner">
+          <div class="label build">DAY 02 · 묵상</div>
+          <h3 class="key-pull build">결심했다고 해서<br/>두렵지 않은 것은 아닙니다.</h3>
+          <p class="body build" style="margin-top: 18px;">
+            바울은 주를 위해 고난받기로 결심한 사람이었지만, 결심이 두려움을 없애주지는 않았습니다. 그런 바울에게 주님은 환상 중에 찾아오셔서 <span class="strong">침묵하지 말고 말하라</span> 하셨습니다.
+          </p>
+          <p class="body build" style="margin-top: 14px;">
+            용기를 얻은 바울은 1년 6개월을 그곳에 머물며 말씀을 가르쳤고, 회당장 그리스보와 소스데네 같은 이들이 믿음을 갖게 되는 유의미한 역사가 일어났습니다.
+          </p>
+        </div>
+      </section>
+      <section class="slide bg-card" data-bg="light">
+        <div class="slide-inner">
+          <div class="label build">DAY 02 · 적용 + 기도</div>
+          <h3 class="display-md build">두려움 대신 한 걸음 내딛기.</h3>
+          <div class="qline build">
+            <span class="qnum">01</span>
+            <span class="qtext">지금 내가 두려워서 침묵하고 있는 자리는 어디입니까?</span>
+          </div>
+          <div class="qline build">
+            <span class="qnum">02</span>
+            <span class="qtext">주님이 함께 계신다는 약속이 오늘 내게 어떤 용기를 줍니까?</span>
+          </div>
+          <div class="prayer-divider build"></div>
+          <p class="prayer-text build">
+            주님, 제가 두려워하는 그 자리에 주님이 함께 계심을 믿습니다.<br/>
+            침묵 대신 오늘 한 걸음 내딛게 하소서.
+          </p>
+          <span class="amen build">— 아멘.</span>
+        </div>
+      </section>
+
+      <!-- DAY 3 -->
+      <section class="slide bg-dark" data-bg="dark">
+        <div class="slide-inner two-col">
+          <div>
+            <div class="label build">DAY 03 · 세상의 법정</div>
+            <h2 class="display-xl build">자신에게 해만<br/>안 끼치면 그만입니다.</h2>
+            <p class="subhead build">회당장 소스데네가 법정 앞에서 집단 린치를 당했지만, 총독 갈리오는 그 폭력을 방관했습니다.</p>
+            <div class="scripture build">
+              <p class="quote">"모든 사람이 회당장 소스데네를 붙잡아 법정 앞에서 때리되 갈리오는 이 일을 상관하지 아니하니라."</p>
+              <p class="cite">사도행전 18:17</p>
+            </div>
+          </div>
+          <div class="day-illustration build"><svg><use href="#day3-svg"/></svg></div>
+        </div>
+      </section>
+      <section class="slide bg-canvas" data-bg="light">
+        <div class="slide-inner">
+          <div class="label build">DAY 03 · 묵상</div>
+          <h3 class="key-pull build">이것이 로마의 법,<br/>우리가 사는 세상의 법입니다.</h3>
+          <p class="body build" style="margin-top: 18px;">
+            갈리오는 유대인의 고발이 로마법 사안이 아니라며 지극히 상식적으로 판단했지만, 정작 폭력 앞에서는 침묵했습니다. <span class="strong">자신에게 위협이 되지 않으면 개입하지 않는 것</span>, 그것이 세상의 법입니다.
+          </p>
+          <p class="body build" style="margin-top: 14px;">
+            우리가 붙잡고 있는 공정과 정의의 잣대도 다르지 않습니다. 나에게 유익이 되면 괜찮고, 나를 불편하게 하는 것만은 참지 못하는 우리 역시 로마의 법을 따르는 로마 시민일 수 있습니다.
+          </p>
+        </div>
+      </section>
+      <section class="slide bg-card" data-bg="light">
+        <div class="slide-inner">
+          <div class="label build">DAY 03 · 적용 + 기도</div>
+          <h3 class="display-md build">방관자가 아니라 이웃이 되기.</h3>
+          <div class="qline build">
+            <span class="qnum">01</span>
+            <span class="qtext">내게 손해되지 않는다는 이유로, 모른 척 지나친 사람이 있습니까?</span>
+          </div>
+          <div class="qline build">
+            <span class="qnum">02</span>
+            <span class="qtext">내 주변의 약자를 향해 나는 어떤 태도를 취하고 있습니까?</span>
+          </div>
+          <div class="prayer-divider build"></div>
+          <p class="prayer-text build">
+            주님, 저를 방관자가 아니라 이웃이 되게 하소서.<br/>
+            제게 유익이 없어도 사랑을 실천하게 하소서.
+          </p>
+          <span class="amen build">— 아멘.</span>
+        </div>
+      </section>
+
+      <!-- DAY 4 -->
+      <section class="slide bg-canvas" data-bg="light">
+        <div class="slide-inner two-col">
+          <div>
+            <div class="label build">DAY 04 · 생업과 복음</div>
+            <h2 class="display-xl build">천막을 만드는 일과<br/>말씀을 전하는 일.</h2>
+            <p class="subhead build">바울은 브리스길라와 아굴라 부부와 함께 천막을 만들며 1년 6개월 동안 말씀을 가르쳤습니다.</p>
+            <div class="scripture build">
+              <p class="quote">"생업이 같으므로 함께 살며 일을 하니 그 생업은 천막을 만드는 것이더라."</p>
+              <p class="cite">사도행전 18:3</p>
+            </div>
+          </div>
+          <div class="day-illustration build"><svg><use href="#day4-svg"/></svg></div>
+        </div>
+      </section>
+      <section class="slide bg-canvas" data-bg="light">
+        <div class="slide-inner">
+          <div class="label build">DAY 04 · 묵상</div>
+          <h3 class="key-pull build">교회 안과 밖은<br/>절대 분리되지 않습니다.</h3>
+          <p class="body build" style="margin-top: 18px;">
+            바울은 회당에서만 24시간 살지 않았습니다. 천막을 만드는 일과 말씀을 전하는 일을 분리하지 않았습니다. <span class="strong">학교 공부와 신앙생활, 직장 일과 그리스도인의 삶</span>도 다르지 않습니다.
+          </p>
+          <p class="body build" style="margin-top: 14px;">
+            예배당 문을 나서면서 우리는 질문해야 합니다. "거룩하신 하나님 앞에서 오늘 어떤 말, 표정, 행동, 선택을 할 것인가." 이 질문이 곧 성령 충만한 삶입니다.
+          </p>
+        </div>
+      </section>
+      <section class="slide bg-card" data-bg="light">
+        <div class="slide-inner">
+          <div class="label build">DAY 04 · 적용 + 기도</div>
+          <h3 class="display-md build">오늘 일터에서 나를 살펴보기.</h3>
+          <div class="qline build">
+            <span class="qnum">01</span>
+            <span class="qtext">오늘 내 일터에서, 나의 말과 표정은 무엇을 전하고 있었습니까?</span>
+          </div>
+          <div class="qline build">
+            <span class="qnum">02</span>
+            <span class="qtext">친교실이나 직장에서 혼자인 사람을 살핀 적이 있습니까?</span>
+          </div>
+          <div class="prayer-divider build"></div>
+          <p class="prayer-text build">
+            주님, 교회 안과 밖이 다르지 않은 삶을 살게 하소서.<br/>
+            제 생업이 곧 말씀을 전하는 자리가 되게 하소서.
+          </p>
+          <span class="amen build">— 아멘.</span>
+        </div>
+      </section>
+
+      <!-- DAY 5 -->
+      <section class="slide bg-canvas" data-bg="light">
+        <div class="slide-inner two-col">
+          <div>
+            <div class="label build">DAY 05 · 일상의 신실함</div>
+            <h2 class="display-xl build">특별한 체험이 아니라,<br/>성실함이었습니다.</h2>
+            <p class="subhead build">정작 부족했던 것은 일상의 신실함이었습니다.</p>
+            <div class="scripture build">
+              <p class="quote">"일 년 육 개월을 머물며 그들 가운데서 하나님의 말씀을 가르치니라."</p>
+              <p class="cite">사도행전 18:11</p>
+            </div>
+          </div>
+          <div class="day-illustration build"><svg><use href="#day5-svg"/></svg></div>
+        </div>
+      </section>
+      <section class="slide bg-canvas" data-bg="light">
+        <div class="slide-inner">
+          <div class="label build">DAY 05 · 묵상</div>
+          <h3 class="key-pull build">댓가 없이 사랑하는 일은<br/>숫자로 환산되지 않습니다.</h3>
+          <p class="body build" style="margin-top: 18px;">
+            기도 몇 시간, 성경 몇 독은 숫자로 확인되지만, 댓가 없이 사랑하고 응답 없이 기도하며 미워하는 이를 돕는 일은 드라마틱하지 않습니다. 그래서 우리는 자꾸 <span class="strong">눈에 보이는 종교활동만 신앙의 전부</span>로 여깁니다.
+          </p>
+          <p class="body build" style="margin-top: 14px;">
+            바울처럼 1년 6개월만 성실하게 일상을 살아낸다면, 그 불모지 같은 자리에서도 우리는 변화된 나, 그리고 나를 통해 변화된 사람들을 보게 될 것입니다.
+          </p>
+        </div>
+      </section>
+      <section class="slide bg-dark" data-bg="dark">
+        <div class="slide-inner">
+          <div class="label build">마지막 기도</div>
+          <h3 class="display-md build">한 주의 묵상에서<br/>한 가지를 챙겨가기.</h3>
+          <div class="qline build">
+            <span class="qnum">01</span>
+            <span class="qtext">이번 한 주, 내가 성실하게 붙잡고 싶은 평범한 자리는 어디입니까?</span>
+          </div>
+          <div class="qline build">
+            <span class="qnum">02</span>
+            <span class="qtext">한 주 묵상에서 가장 깊이 남은 한 문장을, 일상에서 어떻게 살아내시겠습니까?</span>
+          </div>
+          <div class="prayer-divider build"></div>
+          <p class="prayer-text build">
+            주님, 오늘 하루를 그리스도인답게 살아내게 하소서.<br/>
+            담대하게, 신실하게, 성실하게 살아가게 하소서.
+          </p>
+          <span class="amen build">— 아멘.</span>
+        </div>
+      </section>
+
+    </div>
+  </div>
+</div>
+
+<script>
+  const deck = document.getElementById("deck");
+  const slides = Array.from(document.querySelectorAll(".slide"));
+  const total = slides.length;
+  const curEl = document.getElementById("curIdx");
+  const totEl = document.getElementById("totIdx");
+  totEl.textContent = total;
+  let cur = 0;
+  function applyMode() {
+    const isDark = (slides[cur].dataset.bg || "light") === "dark";
+    deck.classList.toggle("dark-mode", isDark);
+  }
+  function snapPositions(activeIdx) {
+    slides.forEach((s, i) => {
+      s.classList.remove("is-current", "is-prev", "is-next", "is-animating");
+      if (i === activeIdx) s.classList.add("is-current");
+      else if (i < activeIdx) s.classList.add("is-prev");
+      else s.classList.add("is-next");
+    });
+  }
+  function go(idx, push = true) {
+    idx = Math.max(0, Math.min(total - 1, idx));
+    if (idx === cur && slides[cur].classList.contains("is-current")) return;
+    const dir = idx >= cur ? "fwd" : "back";
+    const oldCur = cur;
+    slides.forEach((s, i) => {
+      if (i === oldCur || i === idx) return;
+      s.classList.remove("is-current", "is-prev", "is-next", "is-animating");
+      if (i < idx) s.classList.add("is-prev");
+      else s.classList.add("is-next");
+    });
+    const out = slides[oldCur], inc = slides[idx];
+    out.classList.add("is-animating"); inc.classList.add("is-animating");
+    requestAnimationFrame(() => {
+      out.classList.remove("is-current");
+      out.classList.add(dir === "fwd" ? "is-prev" : "is-next");
+      inc.classList.remove("is-prev", "is-next");
+      inc.classList.add("is-current");
+    });
+    cur = idx;
+    curEl.textContent = cur + 1;
+    applyMode();
+    if (push) history.replaceState(null, "", `#${cur + 1}`);
+  }
+  const initialHash = parseInt(location.hash.replace("#", ""), 10);
+  const startIdx = Number.isFinite(initialHash) && initialHash >= 1 ? Math.min(initialHash - 1, total - 1) : 0;
+  cur = startIdx;
+  snapPositions(startIdx);
+  curEl.textContent = cur + 1;
+  applyMode();
+  function next() { go(cur + 1); }
+  function prev() { go(cur - 1); }
+  document.addEventListener("keydown", (e) => {
+    switch (e.key) {
+      case "ArrowRight": case " ": case "PageDown": e.preventDefault(); next(); break;
+      case "ArrowLeft": case "PageUp": e.preventDefault(); prev(); break;
+      case "Home": e.preventDefault(); go(0); break;
+      case "End": e.preventDefault(); go(total - 1); break;
+      case "f": case "F":
+        if (!document.fullscreenElement) document.documentElement.requestFullscreen?.();
+        else document.exitFullscreen?.();
+        break;
+    }
+  });
+  document.getElementById("navLeft").addEventListener("click", prev);
+  document.getElementById("navRight").addEventListener("click", next);
+
+  document.querySelectorAll(".day-tile[data-goto]").forEach(tile => {
+    const handler = (e) => {
+      e.preventDefault();
+      go(parseInt(tile.dataset.goto, 10));
+    };
+    tile.addEventListener("click", handler);
+    tile.addEventListener("keydown", (e) => {
+      if (e.key === "Enter" || e.key === " ") handler(e);
+    });
+  });
+  let tx = null;
+  deck.addEventListener("touchstart", (e) => { tx = e.touches[0].clientX; }, { passive: true });
+  deck.addEventListener("touchend", (e) => {
+    if (tx === null) return;
+    const dx = e.changedTouches[0].clientX - tx;
+    if (Math.abs(dx) > 60) (dx < 0 ? next : prev)();
+    tx = null;
+  });
+</script>
+</body>
+</html>
