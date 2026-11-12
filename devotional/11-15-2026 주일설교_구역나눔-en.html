@@ -1,0 +1,393 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Small Group Sheet — The Ship That Cannot Sink</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --primary: #cc785c;
+    --canvas: #faf9f5;
+    --card: #efe9de;
+    --dark: #181715;
+    --ink: #141413;
+    --body: #3d3d3a;
+    --muted: #6c6a64;
+    --on-dark: #faf9f5;
+    --on-dark-soft: #a09d96;
+    --hairline: #e6dfd8;
+    --font-display: "Playfair Display", Georgia, serif;
+    --font-sans: "Inter", -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: var(--font-sans);
+    background: var(--canvas);
+    color: var(--ink);
+    -webkit-font-smoothing: antialiased;
+  }
+  .page {
+    max-width: 760px;
+    margin: 0 auto;
+    padding: clamp(28px, 6vw, 64px) clamp(20px, 5vw, 40px) clamp(60px, 8vw, 96px);
+  }
+
+  header.hero {
+    text-align: center;
+    padding-bottom: clamp(28px, 5vw, 44px);
+    margin-bottom: clamp(28px, 5vw, 44px);
+    border-bottom: 1px solid var(--hairline);
+  }
+  .well-icon { width: clamp(64px, 9vw, 84px); height: auto; margin: 0 auto 18px; display: block; }
+  .kicker {
+    font-family: var(--font-sans); font-weight: 700;
+    font-size: clamp(12px, 1.6vw, 14px); letter-spacing: 0.14em;
+    text-transform: uppercase; color: var(--primary);
+    margin-bottom: 14px;
+  }
+  .hero h1 {
+    font-family: var(--font-display); font-weight: 800;
+    font-size: clamp(34px, 7vw, 54px);
+    line-height: 1.15; letter-spacing: -0.01em;
+    color: var(--ink);
+    margin-bottom: 14px;
+  }
+  .hero .meta {
+    font-family: var(--font-sans); font-weight: 500;
+    font-size: clamp(14px, 2vw, 16px);
+    color: var(--muted);
+    line-height: 1.6;
+  }
+  .hero .meta b { color: var(--ink); font-weight: 700; }
+
+  section { margin-bottom: clamp(32px, 6vw, 52px); }
+  .section-label {
+    display: flex; align-items: center; gap: 10px;
+    font-family: var(--font-sans); font-weight: 700;
+    font-size: clamp(11px, 1.6vw, 13px); letter-spacing: 0.12em;
+    text-transform: uppercase; color: var(--primary);
+    margin-bottom: 16px;
+  }
+  .section-label .num {
+    display: inline-flex; align-items: center; justify-content: center;
+    width: 24px; height: 24px; border-radius: 50%;
+    background: var(--primary); color: var(--on-dark);
+    font-family: var(--font-display); font-weight: 800; font-size: 13px;
+    flex-shrink: 0;
+  }
+  h2.section-title {
+    font-family: var(--font-display); font-weight: 800;
+    font-size: clamp(22px, 3.6vw, 30px);
+    line-height: 1.3; letter-spacing: -0.01em;
+    margin-bottom: 14px;
+  }
+  .card {
+    background: var(--card);
+    border-radius: 18px;
+    padding: clamp(22px, 4vw, 32px);
+  }
+  .card.dark { background: var(--dark); color: var(--on-dark); }
+
+  p.body-text {
+    font-family: var(--font-sans); font-weight: 400;
+    font-size: clamp(15.5px, 1.9vw, 17.5px);
+    line-height: 1.75;
+    color: var(--body);
+  }
+  p.body-text + p.body-text { margin-top: 14px; }
+  .card.dark p.body-text { color: var(--on-dark-soft); }
+
+  .icebreak-q {
+    font-family: var(--font-display); font-weight: 700;
+    font-size: clamp(18px, 2.4vw, 22px);
+    line-height: 1.5;
+    color: var(--ink);
+  }
+
+  .scripture {
+    margin: 20px 0 0;
+    padding-left: 18px;
+    border-left: 4px solid var(--primary);
+  }
+  .scripture .quote {
+    font-family: var(--font-display); font-weight: 700; font-style: italic;
+    font-size: clamp(17px, 2.2vw, 20px);
+    line-height: 1.55; color: var(--ink);
+    margin-bottom: 8px;
+  }
+  .scripture .cite {
+    font-family: var(--font-sans); font-weight: 700;
+    font-size: clamp(12px, 1.4vw, 14px);
+    text-transform: uppercase; letter-spacing: 0.06em;
+    color: var(--muted);
+  }
+
+  ol.qlist { list-style: none; counter-reset: q; }
+  ol.qlist li {
+    counter-increment: q;
+    display: flex; gap: 14px;
+    padding: 16px 0;
+    border-bottom: 1px solid var(--hairline);
+  }
+  ol.qlist li:last-child { border-bottom: none; }
+  ol.qlist li::before {
+    content: "Q" counter(q);
+    font-family: var(--font-display); font-weight: 800;
+    font-size: clamp(14px, 1.9vw, 16px);
+    color: var(--primary);
+    flex-shrink: 0;
+    width: 40px;
+  }
+  ol.qlist li .qtext {
+    font-family: var(--font-sans); font-weight: 500;
+    font-size: clamp(15px, 1.9vw, 17px);
+    line-height: 1.6; color: var(--ink);
+  }
+  .qtext small {
+    display: block; margin-top: 4px;
+    font-weight: 400; font-size: 0.85em; color: var(--muted);
+  }
+  .notes-line {
+    margin-top: 10px;
+    border-bottom: 1px dashed var(--hairline);
+    height: 22px;
+  }
+
+  ul.prayer-points { list-style: none; }
+  ul.prayer-points li {
+    position: relative;
+    padding: 12px 0 12px 26px;
+    font-family: var(--font-sans); font-weight: 400;
+    font-size: clamp(15px, 1.9vw, 17px);
+    line-height: 1.6; color: var(--body);
+    border-bottom: 1px solid var(--hairline);
+  }
+  ul.prayer-points li:last-child { border-bottom: none; }
+  ul.prayer-points li::before {
+    content: "";
+    position: absolute; left: 0; top: 21px;
+    width: 8px; height: 8px; border-radius: 50%;
+    background: var(--primary);
+  }
+
+  .closing-prayer .body-text {
+    font-family: var(--font-display); font-style: italic;
+    font-size: clamp(16px, 2vw, 18px);
+    line-height: 1.95;
+    color: var(--on-dark-soft);
+    white-space: pre-line;
+  }
+  .closing-prayer .amen {
+    margin-top: 16px;
+    font-family: var(--font-sans); font-weight: 700;
+    color: var(--primary); letter-spacing: 0.04em;
+    font-style: normal;
+  }
+
+  footer {
+    text-align: center;
+    padding-top: clamp(28px, 5vw, 40px);
+    margin-top: clamp(28px, 5vw, 40px);
+    border-top: 1px solid var(--hairline);
+    font-family: var(--font-sans); font-weight: 500;
+    font-size: 13px; color: var(--muted);
+    letter-spacing: 0.02em;
+  }
+
+
+  /* ---------- Passage outline ---------- */
+  .read-guide { margin-bottom: 18px; }
+  ul.outline { list-style: none; }
+  ul.outline li {
+    display: flex; gap: 14px; align-items: baseline;
+    padding: 11px 0;
+    border-bottom: 1px solid var(--hairline);
+    font-family: var(--font-sans); font-weight: 500;
+    font-size: clamp(15px, 1.9vw, 17px); line-height: 1.55; color: var(--ink);
+  }
+  ul.outline li:last-child { border-bottom: none; }
+  ul.outline .vv {
+    flex-shrink: 0; width: 82px; white-space: nowrap;
+    font-family: var(--font-display); font-weight: 800;
+    font-size: clamp(14px, 1.8vw, 16px); color: var(--primary);
+  }
+
+  /* ---------- Leader notes ---------- */
+  details.leader {
+    border: 1px solid var(--hairline);
+    border-radius: 18px;
+    background: transparent;
+  }
+  details.leader summary {
+    cursor: pointer; list-style: none;
+    padding: clamp(18px, 3.5vw, 24px) clamp(22px, 4vw, 32px);
+    font-family: var(--font-sans); font-weight: 700;
+    font-size: clamp(15px, 1.9vw, 17px); color: var(--ink);
+    display: flex; justify-content: space-between; align-items: center; gap: 12px;
+  }
+  details.leader summary::-webkit-details-marker { display: none; }
+  details.leader summary::after {
+    content: "+"; font-family: var(--font-display); font-weight: 800;
+    font-size: 22px; color: var(--primary); line-height: 1;
+  }
+  details.leader[open] summary::after { content: "\2212"; }
+  details.leader .leader-body { padding: 0 clamp(22px, 4vw, 32px) clamp(22px, 4vw, 32px); }
+  details.leader h3 {
+    font-family: var(--font-sans); font-weight: 700;
+    font-size: clamp(15px, 1.9vw, 17px); color: var(--primary);
+    margin: 18px 0 6px;
+  }
+  details.leader h3:first-child { margin-top: 0; }
+  details.leader p, details.leader li {
+    font-family: var(--font-sans); font-weight: 400;
+    font-size: clamp(15px, 1.8vw, 16.5px); line-height: 1.7; color: var(--body);
+  }
+  details.leader ul { padding-left: 1.1em; }
+  details.leader li { margin: 4px 0; }
+
+  @media print {
+    details.leader .leader-body { display: block; }
+  }
+
+  @media print {
+    body { background: #fff; }
+    section { break-inside: avoid; }
+  }
+</style>
+</head>
+<body>
+<div class="page">
+
+  <header class="hero">
+    <svg class="well-icon" viewBox="0 0 1024 1024" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+      <path d="M512 180 L512 640" stroke="#cc785c" stroke-width="22" stroke-linecap="round"/>
+      <path d="M512 230 L512 560 L330 560 Z" stroke="#cc785c" stroke-width="22" stroke-linejoin="round" fill="none"/>
+      <path d="M540 270 L540 560 L690 560 Z" stroke="#cc785c" stroke-width="22" stroke-linejoin="round" fill="none"/>
+      <path d="M250 640 L774 640 L700 740 L324 740 Z" stroke="#cc785c" stroke-width="22" stroke-linejoin="round" fill="none"/>
+      <path d="M160 820 C220 780 280 780 340 820 C400 860 460 860 520 820 C580 780 640 780 700 820 C760 860 820 860 864 830" stroke="#cc785c" stroke-width="18" stroke-linecap="round" fill="none"/>
+      <path d="M250 900 C300 870 350 870 400 900 C450 930 500 930 550 900 C600 870 650 870 700 900 C730 918 760 922 780 915" stroke="#cc785c" stroke-width="12" stroke-linecap="round" fill="none"/>
+      <path d="M770 150 L782 196 L828 208 L782 220 L770 266 L758 220 L712 208 L758 196 Z" fill="#cc785c"/>
+    </svg>
+    <div class="kicker">Small Group Bible Study</div>
+    <h1>The Ship That Cannot&nbsp;Sink</h1>
+    <div class="meta">
+      Sunday Worship · November 15, 2026<br>
+      Text <b>Acts 27:21&ndash;26</b> (ESV) · See also <b>Acts 23:11; 27:9&ndash;20</b>
+    </div>
+  </header>
+
+  <section>
+    <div class="section-label"><span class="num">1</span>Opening Up</div>
+    <div class="card">
+      <p class="icebreak-q">When traveling, moving, or decluttering, have you ever packed something and thought, &ldquo;I really didn&rsquo;t need to bring this&rdquo;? On the other hand, what is something you just couldn&rsquo;t bring yourself to throw away?</p>
+    </div>
+  </section>
+
+  <section>
+    <div class="section-label"><span class="num">2</span>Reading the Passage</div>
+    <p class="body-text read-guide">Take turns reading Acts 27:1&ndash;26 aloud, a few verses each. Then read verses 21&ndash;26 together once more, and consider what made Paul different from everyone else caught in the same storm.</p>
+    <div class="card">
+      <ul class="outline">
+        <li><span class="vv">1&ndash;8</span>From Caesarea through Myra to Fair Havens, a voyage slowed by contrary winds</li>
+        <li><span class="vv">9&ndash;12</span>Paul&rsquo;s warning; &ldquo;the centurion paid more attention to the pilot and to the owner of the ship&rdquo;; the majority decides to sail for Phoenix</li>
+        <li><span class="vv">13&ndash;20</span>The northeaster; the cargo and tackle thrown overboard; &ldquo;all hope of our being saved was at last abandoned&rdquo;</li>
+        <li><span class="vv">21&ndash;26</span>Paul&rsquo;s declaration: &ldquo;Take heart&hellip; I have faith in God that it will be exactly as I have been told&rdquo;</li>
+      </ul>
+    </div>
+  </section>
+
+  <section>
+    <div class="section-label"><span class="num">3</span>Message Summary</div>
+    <h2 class="section-title">The storm is God&rsquo;s declaration that He will be Lord</h2>
+    <p class="body-text">The Titanic, the ship that &ldquo;could not sink,&rdquo; went down after striking an iceberg. The storms that suddenly hit our lives and our church may be God&rsquo;s declaration: &ldquo;Now I will be the Lord of your life.&rdquo; The ship carrying Paul to Rome was a miniature of the Roman Empire. The centurion and soldiers carried the emperor&rsquo;s authority, and the great ship, its owner and crew, and its hold full of grain stood for the empire&rsquo;s power and wealth. The centurion trusted the experts over Paul&rsquo;s warning, and the majority, wanting a more comfortable winter, set sail for Phoenix. Listening to the majority is a good thing, but because the majority can also voice its own desires, it doesn&rsquo;t guarantee the right decision. What was meant to be a one-day trip turned into endless drifting in the northeaster. The sailors threw overboard the grain, the very reason the ship existed, and then even the tackle they needed to sail. The thing that made us who we are can become the heaviest burden in a storm. Just as pilgrims must travel light, a storm teaches us to tell what truly matters from what doesn&rsquo;t.</p>
+    <p class="body-text">When neither sun nor stars appeared and all hope was gone, Paul stood up among them and said, &ldquo;Take heart.&rdquo; This was not empty comfort; he had solid ground. Faith is not grabbing at something out of fear but entrusting ourselves to God because we have good reason to. We need a &ldquo;grammar of faith&rdquo; that lets us read any situation through God&rsquo;s eyes. The angel gave two promises: &ldquo;You must stand before Caesar,&rdquo; and &ldquo;God has granted you all those who sail with you.&rdquo; The two are really one. When one person stays faithful to their calling, the whole community entrusted to them is carried along. When we can&rsquo;t make it on our own strength, faith means leaning on the faith of the person beside us. We don&rsquo;t know what tomorrow holds, but we read today in light of God&rsquo;s sure promise, the &ldquo;fixed point&rdquo; of our future. That is why Paul could say, &ldquo;We must run aground on some island.&rdquo; A ship with Jesus Christ as its captain will never sink.</p>
+    <div class="scripture">
+      <div class="quote">&ldquo;So take heart, men, for I have faith in God that it will be exactly as I have been told.&rdquo;</div>
+      <div class="cite">Acts 27:25</div>
+    </div>
+  </section>
+
+  <section>
+    <div class="section-label"><span class="num">4</span>Observation Questions</div>
+    <div class="card">
+      <ol class="qlist">
+        <li><div class="qtext">Despite Paul&rsquo;s warning, why did the centurion and the majority decide to sail for Phoenix? What reasons and desires lay behind that decision? <small>Acts 27:9&ndash;12</small></div></li>
+        <li><div class="qtext">What did the people on board throw away, step by step, during the storm? Even after all that, what state did they end up in? <small>Acts 27:17&ndash;20</small></div></li>
+        <li><div class="qtext">What was the basis for Paul telling everyone to &ldquo;take heart&rdquo;? How are the angel&rsquo;s two promises connected as one? <small>Acts 27:22&ndash;26; 23:11</small></div></li>
+      </ol>
+    </div>
+  </section>
+
+  <section>
+    <div class="section-label"><span class="num">5</span>Life Application</div>
+    <div class="card">
+      <ol class="qlist">
+        <li><div class="qtext">What is the &ldquo;grain&rdquo; loaded on the ship of your life&mdash;your pride, your livelihood, the thing you&rsquo;ve believed makes you who you are? Has it ever become a heavy burden in the middle of a storm?<div class="notes-line"></div></div></li>
+        <li><div class="qtext">If you saw a storm that suddenly hit your life as God saying, &ldquo;Now I will be the Lord of your life,&rdquo; how might you understand that experience differently?<div class="notes-line"></div></div></li>
+        <li><div class="qtext">Have you ever been carried along by someone else&rsquo;s faith when you couldn&rsquo;t hold on by your own strength? Who in our group might you need to hold on to right now?<div class="notes-line"></div></div></li>
+      </ol>
+    </div>
+  </section>
+
+  <section>
+    <div class="section-label"><span class="num">6</span>Praying Together</div>
+    <div class="card">
+      <ul class="prayer-points">
+        <li>For courage to let go of the burdens we thought made us who we are, and eyes to tell what to throw away from what to hold on to</li>
+        <li>That even on days when neither sun nor stars appear, we would hear the Lord say, &ldquo;Do not be afraid,&rdquo; and read today in light of His unchanging promise</li>
+        <li>That our church would build a strong grammar of faith that sees every situation through God&rsquo;s eyes</li>
+        <li>That every member, young adult, and the next generation God has given our church would not fall away, but reach God&rsquo;s kingdom together</li>
+      </ul>
+    </div>
+  </section>
+
+  <section class="closing-prayer">
+    <div class="section-label"><span class="num">7</span>Closing Prayer</div>
+    <div class="card dark">
+      <p class="body-text">Loving Father God,
+thank You for coming to us through Your Word as we stand in the middle of the storm.
+In a world where even the ship that boasted it could never sink went down, we confess that what we can rely on is not our experience, knowledge, or plans, but You alone, who rule the wind and the sea.
+Yet we have clung to the &ldquo;grain&rdquo; we believed made us who we are. We see now that our pride, our livelihood, and all we have stored up have been weighing down the ship of our lives.
+Give us courage to let go of the burdens we must lay down, and open our eyes to tell what to throw away from what to hold on to until the end.
+On days when neither sun nor stars appear, let us hear You say, &ldquo;Do not be afraid,&rdquo; and like Paul, let us confess, &ldquo;I have faith in God that it will be exactly as I have been told.&rdquo;
+Though we do not know tomorrow, help us read today in light of Your unchanging promise, and help our church build a grammar of faith that sees every situation through Your eyes.
+Just as You granted Paul all who sailed with him, keep every member and young adult You have given our church, and the next generation too, so that not one falls away.
+On days we cannot hold on by our own strength, let us lean on the faith of those beside us and walk together, until at last we all reach the island You have prepared.
+Now we hand the helm of our lives to You, our Captain. Even when our course changes and our plans fall apart, we trust You to lead us where You want us to go.
+We pray in the name of Jesus Christ, the Lord of our lives.</p>
+      <div class="amen">Amen.</div>
+    </div>
+  </section>
+
+  <section>
+    <details class="leader">
+      <summary>Leader&rsquo;s Notes</summary>
+      <div class="leader-body">
+        <h3>The Route and the Places (27:1&ndash;20)</h3>
+        <p>Paul and his companions left Caesarea on a ship from Adramyttium (a port in northwest Asia Minor), passed Sidon, and reached Myra in Lycia. There they changed to an Alexandrian ship bound for Italy (27:6). These grain ships carried Egyptian wheat to Rome and were vital to feeding the empire. Fair Havens, on the south coast of Crete, was a small bay that was not suitable for spending the winter, while Phoenix, farther west, was a safer harbor (27:12). They set out when a gentle south wind blew, but soon the &ldquo;northeaster&rdquo; (Greek <em>Eurakylon</em>) rushed down from the island. Its name combines the Greek <em>Euros</em> (east wind) and the Latin <em>Aquilo</em> (north wind). There were 276 people on board (27:37). The ship broke apart, but everyone reached the island of Malta safely (27:44; 28:1), just as the promise said: &ldquo;We must run aground on some island.&rdquo;</p>
+        <h3>&ldquo;The Fast&rdquo; (v. 9)</h3>
+        <p>The fast mentioned here is the Day of Atonement (Yom Kippur), on the tenth day of the seventh Jewish month, usually falling between late September and October. As the ancient sources quoted in the sermon show, sailing on the Mediterranean became dangerous around this time, and from mid-November to early March it practically stopped. Paul had already been shipwrecked several times (2 Corinthians 11:25), so his warning also carried the wisdom of experience.</p>
+        <h3>What They Threw Away (vv. 17&ndash;19, 38)</h3>
+        <p>In verse 17 the sailors bound ropes around the hull and lowered the gear (understood as the sails or a sea anchor). In verse 18 they began to jettison the cargo, and in verse 19 they threw the ship&rsquo;s tackle overboard with their own hands. The sermon takes the cargo of verse 18 to be grain, and verse 38 records that they lightened the ship by &ldquo;throwing out the wheat into the sea.&rdquo; In the end they threw away the very thing the ship existed to carry.</p>
+        <h3>&ldquo;You Must Stand Before Caesar&rdquo; (v. 24)</h3>
+        <p>The word explained in the sermon, <em>dei</em> (&ldquo;must&rdquo;), is often used in Luke and Acts to show that God&rsquo;s plan will surely come to pass (Luke 24:44; Acts 23:11, &ldquo;so you must testify also in Rome&rdquo;). The same word appears in verse 26: &ldquo;We must run aground on some island.&rdquo; The storm becomes the place where the promise of 23:11, to bring Paul to Rome, is confirmed again.</p>
+        <h3>Facilitation Tips</h3>
+        <ul>
+          <li>Suggested timing: Opening up 10 min · Reading and summary 15 min · Observation 15 min · Application 20 min · Prayer 15 min</li>
+          <li>Keep Application 2 from becoming an easy answer like &ldquo;every hardship is God&rsquo;s will.&rdquo; If someone is in the middle of a storm right now, listen first and pray together rather than rushing to interpret it.</li>
+          <li>The point about the majority is not that &ldquo;majority rule is wrong,&rdquo; but that even the majority can voice its own desires, so we must discern before God&rsquo;s Word.</li>
+          <li>Near the end of the sermon, the pastor prayed that God would &ldquo;give him&rdquo; every member of the church. This connects to each small group leader&rsquo;s role of carrying their members in prayer. As you share Application 3, close with a commitment to hold on to one another as a group.</li>
+        </ul>
+      </div>
+    </details>
+  </section>
+
+  <footer>
+    Champaign Urbana Korean Church · Sunday Sermon Small Group Bible Study
+  </footer>
+
+</div>
+</body>
+</html>
